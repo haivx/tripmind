@@ -32,9 +32,16 @@ export function ChatInterface({ tripId, initialMessages }: Props) {
   const [isStreaming, setIsStreaming] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const bufferRef = useRef('')
+  const rafRef = useRef<number | null>(null)
+  const messageCountRef = useRef(messages.length)
 
+  // Only scroll when a new message is appended, not on every token
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+    if (messages.length !== messageCountRef.current) {
+      messageCountRef.current = messages.length
+      bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }
   }, [messages])
 
   async function send(text: string) {
@@ -73,10 +80,29 @@ export function ChatInterface({ tripId, initialMessages }: Props) {
       while (true) {
         const { done, value } = await reader.read()
         if (done) break
-        const chunk = decoder.decode(value, { stream: true })
+        bufferRef.current += decoder.decode(value, { stream: true })
+        if (!rafRef.current) {
+          rafRef.current = requestAnimationFrame(() => {
+            const buffered = bufferRef.current
+            bufferRef.current = ''
+            rafRef.current = null
+            setMessages((prev) => {
+              const last = prev[prev.length - 1]
+              return [...prev.slice(0, -1), { ...last, content: last.content + buffered }]
+            })
+          })
+        }
+      }
+
+      // Flush any remaining buffer after stream ends
+      if (rafRef.current) cancelAnimationFrame(rafRef.current)
+      rafRef.current = null
+      if (bufferRef.current) {
+        const remaining = bufferRef.current
+        bufferRef.current = ''
         setMessages((prev) => {
           const last = prev[prev.length - 1]
-          return [...prev.slice(0, -1), { ...last, content: last.content + chunk }]
+          return [...prev.slice(0, -1), { ...last, content: last.content + remaining }]
         })
       }
     } catch {
