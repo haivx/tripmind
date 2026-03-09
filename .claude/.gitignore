@@ -1,0 +1,10 @@
+# Claude Code local settings (không share)
+.claude/settings.local.json
+
+# Keep these in git (share với team / future self)
+# .claude/settings.json ✅
+# .claude/commands/ ✅
+# .claude/agents/ ✅
+# .claude/skills/ ✅
+# .claude/MVP_CHECKLIST.md ✅
+# CLAUDE.md ✅
