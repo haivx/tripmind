@@ -1,11 +1,26 @@
-import { MessageSquare } from 'lucide-react'
+import { createClient } from '@/lib/supabase/server'
+import { ChatInterface } from '@/components/ai/chat-interface'
+import type { ChatMessage } from '@/types'
 
-export default function ChatPage() {
+interface PageProps {
+  params: Promise<{ tripId: string }>
+}
+
+export default async function ChatPage({ params }: PageProps) {
+  const { tripId } = await params
+  const supabase = await createClient()
+
+  const { data: messages } = await supabase
+    .from('chat_messages')
+    .select('*')
+    .eq('trip_id', tripId)
+    .order('created_at', { ascending: true })
+    .limit(100)
+
   return (
-    <div className="text-center py-16 text-muted-foreground text-sm">
-      <MessageSquare className="h-8 w-8 mx-auto mb-2 opacity-30" />
-      <p className="font-medium">AI Chat</p>
-      <p className="mt-1">Coming in Week 2 — ask Claude anything about your trip.</p>
-    </div>
+    <ChatInterface
+      tripId={tripId}
+      initialMessages={(messages ?? []) as ChatMessage[]}
+    />
   )
 }

@@ -5,7 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { MapPin, CalendarDays, Clock, CheckSquare, MessageSquare } from 'lucide-react'
-import type { Trip, Place } from '@/types'
+import { AlertsBanner } from '@/components/ai/alerts-banner'
+import type { Trip, Place, Alert } from '@/types'
 
 interface PageProps {
   params: Promise<{ tripId: string }>
@@ -20,9 +21,10 @@ export default async function TripOverviewPage({ params }: PageProps) {
   const { tripId } = await params
   const supabase = await createClient()
 
-  const [{ data: trip }, { data: places }] = await Promise.all([
+  const [{ data: trip }, { data: places }, { data: alerts }] = await Promise.all([
     supabase.from('trips').select('*').eq('id', tripId).single(),
     supabase.from('places').select('*').eq('trip_id', tripId),
+    supabase.from('alerts').select('*').eq('trip_id', tripId).eq('dismissed', false).order('created_at', { ascending: true }),
   ])
 
   if (!trip) notFound()
@@ -38,8 +40,13 @@ export default async function TripOverviewPage({ params }: PageProps) {
     return acc
   }, {})
 
+  const allAlerts = (alerts ?? []) as Alert[]
+
   return (
     <div className="space-y-4">
+      {/* Alerts */}
+      <AlertsBanner tripId={tripId} initialAlerts={allAlerts} />
+
       {/* Stats row */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <Card>

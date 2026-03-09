@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { Plus, MapPin } from 'lucide-react'
+import { Plus, MapPin, Mail } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/dialog'
 import { PlaceCard } from './place-card'
 import { PlaceForm, type PlacePayload } from './place-form'
+import { ParseEmailForm } from '@/components/ai/parse-email-form'
 import type { Place, PlaceCategory } from '@/types'
 
 const FILTER_CATEGORIES: { value: PlaceCategory | 'all'; label: string }[] = [
@@ -33,6 +34,7 @@ export function PlacesList({ tripId, initialPlaces }: PlacesListProps) {
   const [places, setPlaces] = useState<Place[]>(initialPlaces)
   const [filter, setFilter] = useState<PlaceCategory | 'all'>('all')
   const [addOpen, setAddOpen] = useState(false)
+  const [emailOpen, setEmailOpen] = useState(false)
   const [adding, setAdding] = useState(false)
 
   const visible = filter === 'all' ? places : places.filter((p) => p.category === filter)
@@ -67,24 +69,47 @@ export function PlacesList({ tripId, initialPlaces }: PlacesListProps) {
         <h2 className="font-semibold text-sm text-muted-foreground">
           {places.length} place{places.length !== 1 ? 's' : ''}
         </h2>
-        <Dialog open={addOpen} onOpenChange={setAddOpen}>
-          <DialogTrigger asChild>
-            <Button size="sm">
-              <Plus className="h-4 w-4 mr-1" />
-              Add place
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Add place</DialogTitle>
-            </DialogHeader>
-            <PlaceForm
-              onSubmit={handleAdd}
-              onCancel={() => setAddOpen(false)}
-              loading={adding}
-            />
-          </DialogContent>
-        </Dialog>
+        <div className="flex gap-2">
+          <Dialog open={emailOpen} onOpenChange={setEmailOpen}>
+            <DialogTrigger asChild>
+              <Button size="sm" variant="outline">
+                <Mail className="h-4 w-4 mr-1" />
+                Import email
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Import from email</DialogTitle>
+              </DialogHeader>
+              <ParseEmailForm
+                tripId={tripId}
+                onPlaceAdded={(place) => {
+                  setPlaces((prev) => [...prev, place])
+                  setEmailOpen(false)
+                }}
+              />
+            </DialogContent>
+          </Dialog>
+
+          <Dialog open={addOpen} onOpenChange={setAddOpen}>
+            <DialogTrigger asChild>
+              <Button size="sm">
+                <Plus className="h-4 w-4 mr-1" />
+                Add place
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Add place</DialogTitle>
+              </DialogHeader>
+              <PlaceForm
+                onSubmit={handleAdd}
+                onCancel={() => setAddOpen(false)}
+                loading={adding}
+              />
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       {/* Filter chips */}

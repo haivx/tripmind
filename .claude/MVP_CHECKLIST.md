@@ -47,38 +47,38 @@
 ## Week 2 — AI Features
 
 ### AI Chat
-- [ ] Chat UI (bubble messages, input, send button)
-- [ ] Streaming response from Claude API
-- [ ] System prompt inject trip context
-- [ ] Save conversation history to Supabase
-- [ ] Suggested questions (quick prompts)
+- [x] Chat UI (bubble messages, input, send button)
+- [x] Streaming response from Claude API
+- [x] System prompt inject trip context
+- [x] Save conversation history to Supabase
+- [x] Suggested questions (quick prompts)
 
 ### Parse Email
-- [ ] UI: textarea paste email content
-- [ ] Claude extract booking information
-- [ ] Preview card displaying extracted data
-- [ ] User confirm → save to places table
+- [x] UI: textarea paste email content
+- [x] Claude extract booking information
+- [x] Preview card displaying extracted data
+- [x] User confirm → save to places table
 
 ### Suggest Itinerary
-- [ ] Button "AI suggest itinerary"
-- [ ] Claude receives list of places → returns JSON itinerary
-- [ ] Preview suggested itinerary
-- [ ] User confirm → apply to itinerary_days + places
+- [x] Button "AI suggest itinerary"
+- [x] Claude receives list of places → returns JSON itinerary
+- [x] Preview suggested itinerary
+- [x] User confirm → apply to itinerary_days + places
 
 ### Smart Alerts
-- [ ] Check for unbooked hotels on specific dates
-- [ ] Check places without specific dates
-- [ ] Alert banner on trip overview
-- [ ] Dismiss alert
+- [x] Check for unbooked hotels on specific dates
+- [x] Check places without specific dates
+- [x] Alert banner on trip overview
+- [x] Dismiss alert
 
 ---
 
 ## Week 3 — Polish + Deploy
 
 ### Budget
-- [ ] Total cost by currency
-- [ ] Breakdown by category
-- [ ] Progress bar (spent / budget)
+- [x] Total cost by currency
+- [x] Breakdown by category
+- [x] Progress bar (spent / budget)
 - [ ] VND ↔ JPY conversion (fixed rate OK for MVP)
 
 ### Polish

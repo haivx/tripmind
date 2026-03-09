@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { MapPin, Clock } from 'lucide-react'
+import { SuggestItineraryButton } from '@/components/ai/suggest-itinerary-button'
 import type { Place } from '@/types'
 
 interface PageProps {
@@ -73,6 +73,9 @@ export default async function ItineraryPage({ params }: PageProps) {
 
   return (
     <div className="space-y-6">
+      <div className="flex justify-end">
+        <SuggestItineraryButton tripId={tripId} />
+      </div>
       {[...grouped.entries()].map(([date, dayPlaces]) => (
         <div key={date}>
           <div className="flex items-center gap-2 mb-3">
