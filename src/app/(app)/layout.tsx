@@ -1,4 +1,4 @@
-import { LayoutDashboard, Map, Plane } from 'lucide-react'
+import { LayoutDashboard, Plane } from 'lucide-react'
 import Link from 'next/link'
 import { Separator } from '@/components/ui/separator'
 import { LogoutButton } from '@/components/ui/logout-button'
@@ -6,7 +6,6 @@ import { LogoutButton } from '@/components/ui/logout-button'
 const NAV_ITEMS = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/trips', label: 'Trips', icon: Plane },
-  { href: '/explore', label: 'Explore', icon: Map },
 ]
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
