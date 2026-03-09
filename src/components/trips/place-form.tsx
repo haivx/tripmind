@@ -71,10 +71,9 @@ export function PlaceForm({ defaultValues, onSubmit, onCancel, loading }: PlaceF
 
   const booked = watch('booked')
 
-  async function handleFormSubmit(values: PlaceFormValues) {
-    const rawPrice = parseFloat(values.price ?? '')
-    const price = values.price && !isNaN(rawPrice) ? rawPrice : null
-    const { price: _ignored, ...rest } = values
+  async function handleFormSubmit({ price: priceStr, ...rest }: PlaceFormValues) {
+    const rawPrice = parseFloat(priceStr ?? '')
+    const price = priceStr && !isNaN(rawPrice) ? rawPrice : null
     await onSubmit({ ...rest, price })
   }
 

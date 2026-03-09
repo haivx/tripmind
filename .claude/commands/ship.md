@@ -10,13 +10,17 @@ Prepare to deploy TripMind to Vercel: $ARGUMENTS
 - [ ] `npm run build` — builds successfully locally
 
 ### Security
-- [ ] All API keys in `.env.local` (not committed)
+Run the automated security check first — it catches secrets, .env leaks, and client-side exposure:
+```bash
+bash .claude/hooks/security-check.sh <<< '{"tool_input":{"command":"git push origin main"}}'
+```
+If it fails, fix all reported issues before continuing.
+
 - [ ] Vercel environment variables fully configured:
   - `NEXT_PUBLIC_SUPABASE_URL`
   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
   - `SUPABASE_SERVICE_ROLE_KEY`
   - `ANTHROPIC_API_KEY`
-- [ ] No hardcoded secrets in code
 - [ ] RLS enabled on all Supabase tables
 
 ### Supabase
