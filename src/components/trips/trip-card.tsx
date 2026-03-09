@@ -44,7 +44,6 @@ function formatDate(dateStr: string): string {
 export function TripCard({ trip, onEdit, onDelete }: TripCardProps) {
   return (
     <div className="relative">
-      <Link href={`/trips/${trip.id}`} className="absolute inset-0 rounded-lg z-0" aria-label={trip.title} />
       <Card className="relative group hover:shadow-md transition-shadow">
         <CardHeader className="pb-2 flex flex-row items-start justify-between gap-2">
           <div className="flex-1 min-w-0">
@@ -54,7 +53,7 @@ export function TripCard({ trip, onEdit, onDelete }: TripCardProps) {
               <span className="truncate">{trip.destination}</span>
             </div>
           </div>
-          <div className="flex items-center gap-2 shrink-0 relative z-10">
+          <div className="flex items-center gap-2 shrink-0 relative z-20">
             <Badge variant={STATUS_VARIANTS[trip.status]}>{STATUS_LABELS[trip.status]}</Badge>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -89,6 +88,7 @@ export function TripCard({ trip, onEdit, onDelete }: TripCardProps) {
           )}
         </CardContent>
       </Card>
+      <Link href={`/trips/${trip.id}`} className="absolute inset-0 rounded-lg z-10" aria-label={trip.title} />
     </div>
   )
 }
