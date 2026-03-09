@@ -54,7 +54,7 @@ export async function POST(req: NextRequest): Promise<Response> {
     const cleaned = text.replace(/^```(?:json)?\n?/m, '').replace(/\n?```$/m, '').trim()
     itinerary = JSON.parse(cleaned)
   } catch {
-    return Response.json({ error: 'Failed to parse itinerary', raw: text }, { status: 422 })
+    return Response.json({ error: 'Failed to parse itinerary' }, { status: 422 })
   }
 
   return Response.json({ data: itinerary })

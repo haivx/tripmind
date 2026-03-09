@@ -37,7 +37,7 @@ export async function POST(req: NextRequest): Promise<Response> {
   try {
     extracted = JSON.parse(text.trim())
   } catch {
-    return Response.json({ error: 'Failed to parse response', raw: text }, { status: 422 })
+    return Response.json({ error: 'Failed to parse response' }, { status: 422 })
   }
 
   return Response.json({ data: extracted })
