@@ -53,6 +53,7 @@ export interface Place {
   booked: boolean
   booking_ref: string | null
   visit_date: string | null
+  checkout_date: string | null
   visit_time: string | null
   duration_minutes: number | null
   source_email: string | null
@@ -73,6 +74,7 @@ export interface PlaceInsert {
   booked?: boolean
   booking_ref?: string | null
   visit_date?: string | null
+  checkout_date?: string | null
   visit_time?: string | null
   duration_minutes?: number | null
 }
@@ -87,6 +89,7 @@ export interface PlaceUpdate {
   booked?: boolean
   booking_ref?: string | null
   visit_date?: string | null
+  checkout_date?: string | null
   visit_time?: string | null
   duration_minutes?: number | null
 }

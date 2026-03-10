@@ -24,17 +24,52 @@ const CATEGORIES: { value: PlaceCategory; label: string }[] = [
   { value: 'other', label: 'Other' },
 ]
 
-const placeSchema = z.object({
-  name: z.string().min(1, 'Name is required').max(200),
-  category: z.enum(['accommodation', 'restaurant', 'attraction', 'transport', 'other']),
-  address: z.string().max(500).optional(),
-  notes: z.string().max(2000).optional(),
-  price: z.string().optional(),
-  currency: z.string().min(1).max(5),
-  booked: z.boolean(),
-  booking_ref: z.string().max(100).optional(),
-  visit_date: z.string().optional(),
-})
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/
+
+const placeSchema = z
+  .object({
+    name: z.string().min(1, 'Name is required').max(200, 'Max 200 characters'),
+    category: z.enum(['accommodation', 'restaurant', 'attraction', 'transport', 'other']),
+    address: z.string().max(500, 'Max 500 characters').optional(),
+    notes: z.string().max(2000, 'Max 2000 characters').optional(),
+    price: z
+      .string()
+      .optional()
+      .refine((v) => !v || (!isNaN(parseFloat(v)) && parseFloat(v) >= 0), {
+        message: 'Must be a positive number',
+      }),
+    currency: z
+      .string()
+      .min(1, 'Currency is required')
+      .max(3, 'Max 3 characters')
+      .regex(/^[A-Za-z]+$/, 'Letters only'),
+    booked: z.boolean(),
+    booking_ref: z.string().max(100, 'Max 100 characters').optional(),
+    visit_date: z
+      .string()
+      .optional()
+      .refine((v) => !v || DATE_RE.test(v), { message: 'Invalid date' }),
+    checkout_date: z
+      .string()
+      .optional()
+      .refine((v) => !v || DATE_RE.test(v), { message: 'Invalid date' }),
+  })
+  .superRefine((data, ctx) => {
+    if (data.category === 'accommodation' && !data.checkout_date) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Check-out date is required for accommodation',
+        path: ['checkout_date'],
+      })
+    }
+    if (data.visit_date && data.checkout_date && data.checkout_date <= data.visit_date) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Check-out must be after check-in',
+        path: ['checkout_date'],
+      })
+    }
+  })
 
 type PlaceFormValues = z.infer<typeof placeSchema>
 
@@ -66,10 +101,13 @@ export function PlaceForm({ defaultValues, onSubmit, onCancel, loading }: PlaceF
       booked: defaultValues?.booked ?? false,
       booking_ref: defaultValues?.booking_ref ?? '',
       visit_date: defaultValues?.visit_date ?? '',
+      checkout_date: defaultValues?.checkout_date ?? '',
     },
   })
 
   const booked = watch('booked')
+  const category = watch('category')
+  const isAccommodation = category === 'accommodation'
 
   async function handleFormSubmit({ price: priceStr, ...rest }: PlaceFormValues) {
     const rawPrice = parseFloat(priceStr ?? '')
@@ -82,7 +120,12 @@ export function PlaceForm({ defaultValues, onSubmit, onCancel, loading }: PlaceF
       {/* Name */}
       <div className="space-y-1">
         <Label htmlFor="name">Name *</Label>
-        <Input id="name" placeholder="e.g. Park Hyatt Tokyo" {...register('name')} />
+        <Input
+          id="name"
+          placeholder="e.g. Park Hyatt Tokyo"
+          {...register('name')}
+          className={errors.name ? 'border-destructive' : ''}
+        />
         {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
       </div>
 
@@ -91,9 +134,9 @@ export function PlaceForm({ defaultValues, onSubmit, onCancel, loading }: PlaceF
         <Label>Category *</Label>
         <Select
           defaultValue={defaultValues?.category ?? 'attraction'}
-          onValueChange={(v) => setValue('category', v as PlaceCategory)}
+          onValueChange={(v) => setValue('category', v as PlaceCategory, { shouldValidate: true })}
         >
-          <SelectTrigger>
+          <SelectTrigger className={errors.category ? 'border-destructive' : ''}>
             <SelectValue placeholder="Select category" />
           </SelectTrigger>
           <SelectContent>
@@ -102,23 +145,62 @@ export function PlaceForm({ defaultValues, onSubmit, onCancel, loading }: PlaceF
             ))}
           </SelectContent>
         </Select>
+        {errors.category && <p className="text-xs text-destructive">{errors.category.message}</p>}
       </div>
 
-      {/* Visit date */}
+      {/* Check-in date (or Visit date) */}
       <div className="space-y-1">
-        <Label htmlFor="visit_date">Visit date</Label>
-        <Input id="visit_date" type="date" {...register('visit_date')} />
+        <Label htmlFor="visit_date">{isAccommodation ? 'Check-in date *' : 'Visit date'}</Label>
+        <Input
+          id="visit_date"
+          type="date"
+          {...register('visit_date')}
+          className={errors.visit_date ? 'border-destructive' : ''}
+        />
+        {errors.visit_date && <p className="text-xs text-destructive">{errors.visit_date.message}</p>}
       </div>
+
+      {/* Check-out date — accommodation only */}
+      {isAccommodation && (
+        <div className="space-y-1">
+          <Label htmlFor="checkout_date">Check-out date *</Label>
+          <Input
+            id="checkout_date"
+            type="date"
+            {...register('checkout_date')}
+            className={errors.checkout_date ? 'border-destructive' : ''}
+          />
+          {errors.checkout_date && (
+            <p className="text-xs text-destructive">{errors.checkout_date.message}</p>
+          )}
+        </div>
+      )}
 
       {/* Price + currency */}
       <div className="grid grid-cols-3 gap-2">
         <div className="col-span-2 space-y-1">
           <Label htmlFor="price">Price</Label>
-          <Input id="price" type="number" min="0" step="1" placeholder="0" {...register('price')} />
+          <Input
+            id="price"
+            type="number"
+            min="0"
+            step="1"
+            placeholder="0"
+            {...register('price')}
+            className={errors.price ? 'border-destructive' : ''}
+          />
+          {errors.price && <p className="text-xs text-destructive">{errors.price.message}</p>}
         </div>
         <div className="space-y-1">
           <Label htmlFor="currency">Currency</Label>
-          <Input id="currency" maxLength={3} placeholder="JPY" {...register('currency')} />
+          <Input
+            id="currency"
+            maxLength={3}
+            placeholder="JPY"
+            {...register('currency')}
+            className={errors.currency ? 'border-destructive' : ''}
+          />
+          {errors.currency && <p className="text-xs text-destructive">{errors.currency.message}</p>}
         </div>
       </div>
 
@@ -137,20 +219,41 @@ export function PlaceForm({ defaultValues, onSubmit, onCancel, loading }: PlaceF
       {booked && (
         <div className="space-y-1">
           <Label htmlFor="booking_ref">Booking reference</Label>
-          <Input id="booking_ref" placeholder="e.g. ABC123" {...register('booking_ref')} />
+          <Input
+            id="booking_ref"
+            placeholder="e.g. ABC123"
+            {...register('booking_ref')}
+            className={errors.booking_ref ? 'border-destructive' : ''}
+          />
+          {errors.booking_ref && (
+            <p className="text-xs text-destructive">{errors.booking_ref.message}</p>
+          )}
         </div>
       )}
 
       {/* Address */}
       <div className="space-y-1">
         <Label htmlFor="address">Address</Label>
-        <Input id="address" placeholder="Street address or area" {...register('address')} />
+        <Input
+          id="address"
+          placeholder="Street address or area"
+          {...register('address')}
+          className={errors.address ? 'border-destructive' : ''}
+        />
+        {errors.address && <p className="text-xs text-destructive">{errors.address.message}</p>}
       </div>
 
       {/* Notes */}
       <div className="space-y-1">
         <Label htmlFor="notes">Notes</Label>
-        <Textarea id="notes" rows={3} placeholder="Any details…" {...register('notes')} />
+        <Textarea
+          id="notes"
+          rows={3}
+          placeholder="Any details…"
+          {...register('notes')}
+          className={errors.notes ? 'border-destructive' : ''}
+        />
+        {errors.notes && <p className="text-xs text-destructive">{errors.notes.message}</p>}
       </div>
 
       {/* Actions */}

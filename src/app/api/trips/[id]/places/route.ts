@@ -12,6 +12,7 @@ const placeSchema = z.object({
   booked: z.boolean().default(false),
   booking_ref: z.string().max(100).nullish(),
   visit_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullish(),
+  checkout_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullish(),
   visit_time: z.string().nullish(),
   duration_minutes: z.number().int().positive().nullish(),
 })
