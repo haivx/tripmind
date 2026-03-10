@@ -35,7 +35,8 @@ export async function POST(req: NextRequest): Promise<Response> {
 
   let extracted: unknown
   try {
-    extracted = JSON.parse(text.trim())
+    const cleaned = text.trim().replace(/^```(?:json)?\n?/i, '').replace(/\n?```$/i, '')
+    extracted = JSON.parse(cleaned)
   } catch {
     return Response.json({ error: 'Failed to parse response' }, { status: 422 })
   }
