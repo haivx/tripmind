@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, memo } from 'react'
 import { Send, Bot, User, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
@@ -24,24 +24,64 @@ interface DisplayMessage {
   content: string
 }
 
+// Memoized — skips re-render entirely while streaming is happening
+const MessageBubble = memo(({ message }: { message: DisplayMessage }) => (
+  <div className={cn('flex gap-2.5', message.role === 'user' ? 'flex-row-reverse' : 'flex-row')}>
+    <div
+      className={cn(
+        'flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs',
+        message.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
+      )}
+    >
+      {message.role === 'user' ? <User className="h-3.5 w-3.5" /> : <Bot className="h-3.5 w-3.5" />}
+    </div>
+    <div
+      className={cn(
+        'max-w-[80%] rounded-2xl px-3.5 py-2.5 text-sm',
+        message.role === 'user'
+          ? 'bg-primary text-primary-foreground rounded-tr-sm'
+          : 'bg-muted text-foreground rounded-tl-sm'
+      )}
+    >
+      <p className="whitespace-pre-wrap leading-relaxed">{message.content}</p>
+    </div>
+  </div>
+))
+
+MessageBubble.displayName = 'MessageBubble'
+
+// Isolated — ONLY this component re-renders on every token during streaming
+function StreamingBubble({ content, isStreaming }: { content: string; isStreaming: boolean }) {
+  return (
+    <div className="flex gap-2.5 flex-row">
+      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs bg-muted text-muted-foreground">
+        <Bot className="h-3.5 w-3.5" />
+      </div>
+      <div className="max-w-[80%] rounded-2xl px-3.5 py-2.5 text-sm bg-muted text-foreground rounded-tl-sm">
+        {content === '' && isStreaming ? (
+          <Loader2 className="h-4 w-4 animate-spin" />
+        ) : (
+          <p className="whitespace-pre-wrap leading-relaxed">{content}</p>
+        )}
+      </div>
+    </div>
+  )
+}
+
 export function ChatInterface({ tripId, initialMessages }: Props) {
   const [messages, setMessages] = useState<DisplayMessage[]>(
     initialMessages.map((m) => ({ role: m.role, content: m.content }))
   )
-  const [input, setInput] = useState('')
+  const [streamingContent, setStreamingContent] = useState<string | null>(null)
   const [isStreaming, setIsStreaming] = useState(false)
+  const [input, setInput] = useState('')
   const bottomRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
-  const bufferRef = useRef('')
-  const rafRef = useRef<number | null>(null)
-  const messageCountRef = useRef(messages.length)
+  const streamingContentRef = useRef('')
 
-  // Only scroll when a new message is appended, not on every token
+  // Only scroll when a new complete message is committed — not on every token
   useEffect(() => {
-    if (messages.length !== messageCountRef.current) {
-      messageCountRef.current = messages.length
-      bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-    }
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
   async function send(text: string) {
@@ -52,9 +92,8 @@ export function ChatInterface({ tripId, initialMessages }: Props) {
     const updated: DisplayMessage[] = [...messages, { role: 'user', content }]
     setMessages(updated)
     setIsStreaming(true)
-
-    // Add empty assistant message placeholder
-    setMessages([...updated, { role: 'assistant', content: '' }])
+    setStreamingContent('')         // show streaming bubble immediately
+    streamingContentRef.current = ''
 
     try {
       const res = await fetch('/api/ai/chat', {
@@ -67,51 +106,40 @@ export function ChatInterface({ tripId, initialMessages }: Props) {
       })
 
       if (!res.ok || !res.body) {
-        setMessages((prev) => [
-          ...prev.slice(0, -1),
-          { role: 'assistant', content: 'Sorry, something went wrong. Please try again.' },
-        ])
+        setStreamingContent(null)
+        setMessages([...updated, { role: 'assistant', content: 'Sorry, something went wrong. Please try again.' }])
         return
       }
 
       const reader = res.body.getReader()
       const decoder = new TextDecoder()
+      let lastUpdate = 0
+      const THROTTLE_MS = 50
 
       while (true) {
         const { done, value } = await reader.read()
         if (done) break
-        bufferRef.current += decoder.decode(value, { stream: true })
-        if (!rafRef.current) {
-          rafRef.current = requestAnimationFrame(() => {
-            const buffered = bufferRef.current
-            bufferRef.current = ''
-            rafRef.current = null
-            setMessages((prev) => {
-              const last = prev[prev.length - 1]
-              return [...prev.slice(0, -1), { ...last, content: last.content + buffered }]
-            })
-          })
+
+        streamingContentRef.current += decoder.decode(value, { stream: true })
+
+        const now = Date.now()
+        if (now - lastUpdate >= THROTTLE_MS) {
+          lastUpdate = now
+          setStreamingContent(streamingContentRef.current)
         }
       }
 
-      // Flush any remaining buffer after stream ends
-      if (rafRef.current) cancelAnimationFrame(rafRef.current)
-      rafRef.current = null
-      if (bufferRef.current) {
-        const remaining = bufferRef.current
-        bufferRef.current = ''
-        setMessages((prev) => {
-          const last = prev[prev.length - 1]
-          return [...prev.slice(0, -1), { ...last, content: last.content + remaining }]
-        })
-      }
+      // Commit final content to history
+      const finalContent = streamingContentRef.current
+      setStreamingContent(null)     // hide streaming bubble
+      setMessages([...updated, { role: 'assistant', content: finalContent }])
+
     } catch {
-      setMessages((prev) => [
-        ...prev.slice(0, -1),
-        { role: 'assistant', content: 'Network error. Please try again.' },
-      ])
+      setStreamingContent(null)
+      setMessages([...updated, { role: 'assistant', content: 'Network error. Please try again.' }])
     } finally {
       setIsStreaming(false)
+      streamingContentRef.current = ''
     }
   }
 
@@ -122,20 +150,17 @@ export function ChatInterface({ tripId, initialMessages }: Props) {
     }
   }
 
-  const isEmpty = messages.length === 0
+  const isEmpty = messages.length === 0 && streamingContent === null
 
   return (
     <div className="flex flex-col h-[calc(100vh-220px)] min-h-[400px]">
-      {/* Messages */}
       <div className="flex-1 overflow-y-auto space-y-4 pb-2">
         {isEmpty && (
           <div className="flex flex-col items-center justify-center h-full gap-4 text-center py-8">
             <Bot className="h-10 w-10 text-muted-foreground/40" />
             <div>
               <p className="font-medium text-sm">Ask me anything about your trip</p>
-              <p className="text-xs text-muted-foreground mt-1">
-                I know your saved places and dates
-              </p>
+              <p className="text-xs text-muted-foreground mt-1">I know your saved places and dates</p>
             </div>
             <div className="flex flex-wrap gap-2 justify-center max-w-sm">
               {SUGGESTED_QUESTIONS.map((q) => (
@@ -151,41 +176,19 @@ export function ChatInterface({ tripId, initialMessages }: Props) {
           </div>
         )}
 
+        {/* History — memoized, not affected by streaming */}
         {messages.map((msg, i) => (
-          <div
-            key={i}
-            className={cn('flex gap-2.5', msg.role === 'user' ? 'flex-row-reverse' : 'flex-row')}
-          >
-            <div
-              className={cn(
-                'flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs',
-                msg.role === 'user'
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-muted text-muted-foreground'
-              )}
-            >
-              {msg.role === 'user' ? <User className="h-3.5 w-3.5" /> : <Bot className="h-3.5 w-3.5" />}
-            </div>
-            <div
-              className={cn(
-                'max-w-[80%] rounded-2xl px-3.5 py-2.5 text-sm',
-                msg.role === 'user'
-                  ? 'bg-primary text-primary-foreground rounded-tr-sm'
-                  : 'bg-muted text-foreground rounded-tl-sm'
-              )}
-            >
-              {msg.content === '' && isStreaming && i === messages.length - 1 ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
-              )}
-            </div>
-          </div>
+          <MessageBubble key={i} message={msg} />
         ))}
+
+        {/* Streaming bubble — isolated, only re-renders during active stream */}
+        {streamingContent !== null && (
+          <StreamingBubble content={streamingContent} isStreaming={isStreaming} />
+        )}
+
         <div ref={bottomRef} />
       </div>
 
-      {/* Suggested prompts (when there are messages) */}
       {!isEmpty && !isStreaming && (
         <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
           {SUGGESTED_QUESTIONS.map((q) => (
@@ -200,7 +203,6 @@ export function ChatInterface({ tripId, initialMessages }: Props) {
         </div>
       )}
 
-      {/* Input */}
       <div className="flex gap-2 pt-2 border-t">
         <Textarea
           ref={textareaRef}
@@ -218,11 +220,7 @@ export function ChatInterface({ tripId, initialMessages }: Props) {
           disabled={!input.trim() || isStreaming}
           className="shrink-0 self-end"
         >
-          {isStreaming ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <Send className="h-4 w-4" />
-          )}
+          {isStreaming ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
         </Button>
       </div>
     </div>
