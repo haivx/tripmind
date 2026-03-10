@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation'
+import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import { Badge } from '@/components/ui/badge'
 import { TripTabLink } from '@/components/trips/trip-tab-link'
@@ -22,6 +23,17 @@ const TABS = [
 interface TripLayoutProps {
   children: React.ReactNode
   params: Promise<{ tripId: string }>
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ tripId: string }> }): Promise<Metadata> {
+  const { tripId } = await params
+  const supabase = await createClient()
+  const { data: trip } = await supabase.from('trips').select('title, destination').eq('id', tripId).single()
+  if (!trip) return { title: 'Trip — TripMind' }
+  return {
+    title: `${trip.title} (${trip.destination}) — TripMind`,
+    description: `Plan and manage your trip to ${trip.destination} with TripMind.`,
+  }
 }
 
 export default async function TripLayout({ children, params }: TripLayoutProps) {

@@ -21,6 +21,23 @@ const CATEGORY_LABEL: Record<string, string> = {
   other: 'Shopping',
 }
 
+// Fixed exchange rates → JPY (updated approx. March 2026)
+const TO_JPY: Record<string, number> = {
+  JPY: 1,
+  VND: 0.006,   // 1 VND ≈ 0.006 JPY  (1 JPY ≈ 167 VND)
+  USD: 150,     // 1 USD ≈ 150 JPY
+  EUR: 165,     // 1 EUR ≈ 165 JPY
+  GBP: 190,     // 1 GBP ≈ 190 JPY
+  KRW: 0.11,    // 1 KRW ≈ 0.11 JPY
+  THB: 4.3,     // 1 THB ≈ 4.3 JPY
+  SGD: 112,     // 1 SGD ≈ 112 JPY
+}
+
+function toJPY(amount: number, currency: string): number {
+  const rate = TO_JPY[currency.toUpperCase()] ?? 1
+  return amount * rate
+}
+
 function formatAmount(amount: number, currency: string): string {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
@@ -50,6 +67,15 @@ export default async function BudgetPage({ params }: PageProps) {
     byCurrency[cur][p.category] = (byCurrency[cur][p.category] ?? 0) + p.price
   }
 
+  // Compute grand total in JPY for multi-currency summary
+  const totalJPY = allPlaces.reduce((sum, p) => {
+    if (!p.price) return sum
+    return sum + toJPY(p.price, p.currency ?? 'JPY')
+  }, 0)
+
+  const currencies = Object.keys(byCurrency)
+  const hasMultipleCurrencies = currencies.length > 1 || (currencies.length === 1 && currencies[0] !== 'JPY')
+
   if (allPlaces.length === 0) {
     return (
       <div className="text-center py-16 text-[#717171] text-sm">
@@ -62,6 +88,22 @@ export default async function BudgetPage({ params }: PageProps) {
 
   return (
     <div className="space-y-6">
+      {/* Grand total in JPY (shown when there are non-JPY currencies) */}
+      {hasMultipleCurrencies && (
+        <div className="bg-[#FF385C] rounded-2xl p-5 text-white">
+          <p className="text-xs opacity-80 mb-0.5">Estimated Total (JPY)</p>
+          <p className="text-3xl font-bold">{formatAmount(Math.round(totalJPY), 'JPY')}</p>
+          <p className="text-xs opacity-70 mt-1.5">Converted at fixed rates &middot; for reference only</p>
+          <div className="flex flex-wrap gap-x-4 gap-y-1 mt-3 pt-3 border-t border-white/20 text-xs opacity-80">
+            {Object.entries(TO_JPY)
+              .filter(([cur]) => currencies.includes(cur) && cur !== 'JPY')
+              .map(([cur, rate]) => (
+                <span key={cur}>1 {cur} = {rate >= 1 ? `¥${rate}` : `¥${rate}`}</span>
+              ))}
+          </div>
+        </div>
+      )}
+
       {Object.entries(byCurrency).map(([currency, categories]) => {
         const total = Object.values(categories).reduce((a, b) => a + b, 0)
         const categoryEntries = Object.entries(categories).sort((a, b) => b[1] - a[1])

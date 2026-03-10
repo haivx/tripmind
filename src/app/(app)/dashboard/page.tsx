@@ -1,7 +1,12 @@
 import { Suspense } from 'react'
+import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import { TripList, TripListSkeleton } from '@/components/trips/trip-list'
 import type { Trip } from '@/types'
+
+export const metadata: Metadata = {
+  title: 'Dashboard — TripMind',
+}
 
 async function TripsData() {
   const supabase = await createClient()

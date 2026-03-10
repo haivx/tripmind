@@ -40,7 +40,7 @@
 ### Layout
 - [x] Desktop: sidebar navigation
 - [x] Mobile: bottom navigation (4 tabs)
-- [ ] Responsive layout working at 375px and 1280px
+- [x] Responsive layout working at 375px and 1280px
 
 ---
 
@@ -79,17 +79,17 @@
 - [x] Total cost by currency
 - [x] Breakdown by category
 - [x] Progress bar (spent / budget)
-- [ ] VND ↔ JPY conversion (fixed rate OK for MVP)
+- [x] VND ↔ JPY conversion (fixed rate OK for MVP)
 
 ### Polish
-- [ ] Empty states for all lists
-- [ ] Error boundaries
-- [ ] Loading skeletons
-- [ ] Toast notifications for actions
-- [ ] Page titles and meta tags
+- [x] Empty states for all lists
+- [x] Error boundaries
+- [x] Loading skeletons
+- [x] Toast notifications for actions
+- [x] Page titles and meta tags
 
 ### Deploy & Test
-- [ ] `npm run build` without errors
+- [x] `npm run build` without errors
 - [ ] Test on real mobile device (iPhone Safari)
 - [ ] Enter real Tokyo trip data for Liam
 - [ ] Test AI chat with real questions

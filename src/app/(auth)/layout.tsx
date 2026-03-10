@@ -1,4 +1,9 @@
+import type { Metadata } from 'next'
 import { Plane } from 'lucide-react'
+
+export const metadata: Metadata = {
+  title: 'Sign in — TripMind',
+}
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
