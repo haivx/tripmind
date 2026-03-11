@@ -16,6 +16,8 @@ const placeSchema = z.object({
   checkout_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullish(),
   visit_time: z.string().nullish(),
   duration_minutes: z.number().int().positive().nullish(),
+  latitude: z.number().min(-90).max(90).nullish(),
+  longitude: z.number().min(-180).max(180).nullish(),
 })
 
 interface RouteContext {
@@ -53,11 +55,19 @@ export async function POST(req: NextRequest, { params }: RouteContext): Promise<
     return NextResponse.json({ error: 'Validation failed', details: parsed.error.flatten() }, { status: 400 })
   }
 
-  const coords = parsed.data.address ? await geocodeAddress(parsed.data.address) : null
+  let coords: { latitude: number | null; longitude: number | null } | null = null
+  if (parsed.data.latitude != null && parsed.data.longitude != null) {
+    coords = { latitude: parsed.data.latitude, longitude: parsed.data.longitude }
+  } else if (parsed.data.address) {
+    coords = await geocodeAddress(parsed.data.address)
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { latitude: _lat, longitude: _lng, ...placeData } = parsed.data
 
   const { data, error } = await supabase
     .from('places')
-    .insert({ ...parsed.data, trip_id: tripId, user_id: user.id, ...coords })
+    .insert({ ...placeData, trip_id: tripId, user_id: user.id, ...coords })
     .select()
     .single()
 

@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -14,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { LocationPicker } from '@/components/trips/location-picker'
 import type { Place, PlaceCategory } from '@/types'
 
 const CATEGORIES: { value: PlaceCategory; label: string }[] = [
@@ -57,14 +59,14 @@ const placeSchema = z
   .superRefine((data, ctx) => {
     if (data.category === 'accommodation' && !data.checkout_date) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: 'custom',
         message: 'Check-out date is required for accommodation',
         path: ['checkout_date'],
       })
     }
     if (data.visit_date && data.checkout_date && data.checkout_date <= data.visit_date) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: 'custom',
         message: 'Check-out must be after check-in',
         path: ['checkout_date'],
       })
@@ -73,7 +75,11 @@ const placeSchema = z
 
 type PlaceFormValues = z.infer<typeof placeSchema>
 
-export type PlacePayload = Omit<PlaceFormValues, 'price'> & { price: number | null }
+export type PlacePayload = Omit<PlaceFormValues, 'price'> & {
+  price: number | null
+  latitude?: number | null
+  longitude?: number | null
+}
 
 interface PlaceFormProps {
   defaultValues?: Partial<Place>
@@ -109,10 +115,22 @@ export function PlaceForm({ defaultValues, onSubmit, onCancel, loading }: PlaceF
   const category = watch('category')
   const isAccommodation = category === 'accommodation'
 
-  async function handleFormSubmit({ price: priceStr, ...rest }: PlaceFormValues) {
+  const [pickedCoords, setPickedCoords] = useState<{ latitude: number; longitude: number } | null>(
+    defaultValues?.latitude != null && defaultValues?.longitude != null
+      ? { latitude: defaultValues.latitude, longitude: defaultValues.longitude }
+      : null
+  )
+
+  async function handleFormSubmit({ price: priceStr, visit_date, checkout_date, ...rest }: PlaceFormValues) {
     const rawPrice = parseFloat(priceStr ?? '')
     const price = priceStr && !isNaN(rawPrice) ? rawPrice : null
-    await onSubmit({ ...rest, price })
+    await onSubmit({
+      ...rest,
+      price,
+      visit_date: visit_date || undefined,
+      checkout_date: checkout_date || undefined,
+      ...(pickedCoords ?? {}),
+    })
   }
 
   return (
@@ -231,17 +249,20 @@ export function PlaceForm({ defaultValues, onSubmit, onCancel, loading }: PlaceF
         </div>
       )}
 
-      {/* Address */}
-      <div className="space-y-1">
-        <Label htmlFor="address">Address</Label>
-        <Input
-          id="address"
-          placeholder="Street address or area"
-          {...register('address')}
-          className={errors.address ? 'border-destructive' : ''}
-        />
-        {errors.address && <p className="text-xs text-destructive">{errors.address.message}</p>}
-      </div>
+      {/* Address / Location */}
+      <LocationPicker
+        initialValue={defaultValues?.address ?? ''}
+        onSelect={(selection) => {
+          if (selection) {
+            setValue('address', selection.display_name, { shouldValidate: true })
+            setPickedCoords({ latitude: selection.latitude, longitude: selection.longitude })
+          } else {
+            setValue('address', '', { shouldValidate: false })
+            setPickedCoords(null)
+          }
+        }}
+        error={errors.address?.message}
+      />
 
       {/* Notes */}
       <div className="space-y-1">
