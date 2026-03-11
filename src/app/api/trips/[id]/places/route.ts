@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
+import { geocodeAddress } from '@/lib/geocode'
 
 const placeSchema = z.object({
   name: z.string().min(1).max(200),
@@ -52,9 +53,11 @@ export async function POST(req: NextRequest, { params }: RouteContext): Promise<
     return NextResponse.json({ error: 'Validation failed', details: parsed.error.flatten() }, { status: 400 })
   }
 
+  const coords = parsed.data.address ? await geocodeAddress(parsed.data.address) : null
+
   const { data, error } = await supabase
     .from('places')
-    .insert({ ...parsed.data, trip_id: tripId, user_id: user.id })
+    .insert({ ...parsed.data, trip_id: tripId, user_id: user.id, ...coords })
     .select()
     .single()
 

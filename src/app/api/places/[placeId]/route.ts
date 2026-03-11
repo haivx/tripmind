@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
+import { geocodeAddress } from '@/lib/geocode'
 
 const updateSchema = z.object({
   name: z.string().min(1).max(200).optional(),
@@ -34,9 +35,16 @@ export async function PATCH(req: NextRequest, { params }: RouteContext): Promise
     return NextResponse.json({ error: 'Validation failed', details: parsed.error.flatten() }, { status: 400 })
   }
 
+  // Re-geocode if address was explicitly included in the update payload
+  let coordsUpdate: { latitude: number | null; longitude: number | null } | undefined
+  if ('address' in parsed.data) {
+    const coords = parsed.data.address ? await geocodeAddress(parsed.data.address) : null
+    coordsUpdate = coords ?? { latitude: null, longitude: null }
+  }
+
   const { data, error } = await supabase
     .from('places')
-    .update(parsed.data)
+    .update({ ...parsed.data, ...coordsUpdate })
     .eq('id', placeId)
     .select()
     .single()
