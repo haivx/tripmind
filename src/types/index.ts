@@ -12,6 +12,7 @@ export interface Trip {
   description: string | null
   cover_image: string | null
   status: TripStatus
+  share_token: string | null
   created_at: string
   updated_at: string
 }
@@ -59,6 +60,7 @@ export interface Place {
   source_email: string | null
   latitude: number | null
   longitude: number | null
+  sort_order: number
   created_at: string
   updated_at: string
 }

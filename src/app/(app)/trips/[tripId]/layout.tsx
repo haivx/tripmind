@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import { Badge } from '@/components/ui/badge'
 import { TripTabLink } from '@/components/trips/trip-tab-link'
+import { ShareButton } from '@/components/trips/share-button'
 import type { Trip } from '@/types'
 
 const STATUS_BADGE: Record<string, 'default' | 'secondary' | 'outline' | 'destructive'> = {
@@ -16,6 +17,7 @@ const TABS = [
   { suffix: '', label: 'Overview' },
   { suffix: '/places', label: 'Places' },
   { suffix: '/itinerary', label: 'Itinerary' },
+  { suffix: '/map', label: 'Map' },
   { suffix: '/budget', label: 'Budget' },
   { suffix: '/chat', label: 'AI Chat' },
 ]
@@ -58,6 +60,9 @@ export default async function TripLayout({ children, params }: TripLayoutProps) 
         <div className="flex items-center gap-2 flex-wrap">
           <h1 className="text-xl font-bold tracking-tight">{t.title}</h1>
           <Badge variant={STATUS_BADGE[t.status] ?? 'secondary'}>{t.status}</Badge>
+          <div className="ml-auto">
+            <ShareButton tripId={tripId} />
+          </div>
         </div>
         <p className="text-sm text-muted-foreground">
           {t.destination} &middot; {t.start_date} → {t.end_date}

@@ -99,10 +99,10 @@
 
 ## Backlog (post-MVP)
 - [ ] Google Calendar sync
-- [ ] Dark mode
-- [ ] Drag and drop itinerary
-- [ ] Export itinerary as PDF
-- [ ] Share trip with others (read-only link)
-- [ ] Map view with locations
+- [x] Dark mode
+- [x] Drag and drop itinerary
+- [x] Export itinerary as PDF
+- [x] Share trip with others (read-only link)
+- [x] Map view with locations
 - [ ] Weather integration
 - [ ] Multi-currency realtime exchange rate

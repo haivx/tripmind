@@ -128,3 +128,24 @@
     @apply bg-background text-foreground font-sans;
   }
 }
+
+@media print {
+  aside,
+  header,
+  nav.fixed,
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: white !important;
+  }
+
+  main {
+    padding: 0 !important;
+  }
+
+  .print-break-before {
+    page-break-before: always;
+  }
+}

@@ -2,6 +2,7 @@ import { LayoutDashboard, Plane } from 'lucide-react'
 import Link from 'next/link'
 import { Separator } from '@/components/ui/separator'
 import { LogoutButton } from '@/components/ui/logout-button'
+import { ThemeToggle } from '@/components/theme-toggle'
 
 const NAV_ITEMS = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -15,7 +16,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <aside className="hidden md:flex flex-col w-56 border-r bg-background shrink-0">
         <div className="flex items-center gap-2 px-4 h-14">
           <Plane className="h-5 w-5 text-primary" />
-          <span className="font-semibold text-lg tracking-tight">TripMind</span>
+          <span className="font-semibold text-lg tracking-tight flex-1">TripMind</span>
+          <ThemeToggle />
         </div>
         <Separator />
         <nav className="flex flex-col gap-1 p-2 flex-1">
@@ -37,6 +39,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
       {/* Main content */}
       <div className="flex flex-col flex-1 min-w-0">
+        {/* Mobile top bar */}
+        <header className="flex md:hidden items-center justify-between px-4 h-12 border-b bg-background shrink-0">
+          <div className="flex items-center gap-2">
+            <Plane className="h-4 w-4 text-primary" />
+            <span className="font-semibold tracking-tight">TripMind</span>
+          </div>
+          <ThemeToggle />
+        </header>
         <main className="flex-1 p-4 md:p-6 pb-20 md:pb-6">{children}</main>
       </div>
 

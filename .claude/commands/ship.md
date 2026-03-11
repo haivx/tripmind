@@ -48,6 +48,8 @@ git add -A
 git commit -m "feat: <description>"
 
 # 2. Push to GitHub
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/personal-2026 
 git push origin <branch>
 
 # 3. Merge to main (create PR or merge directly)
