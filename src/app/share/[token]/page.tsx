@@ -44,13 +44,33 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const supabase = createAdminClient()
   const { data: trip } = await supabase
     .from('trips')
-    .select('title, destination')
+    .select('title, destination, start_date, end_date')
     .eq('share_token', token)
     .single()
   if (!trip) return { title: 'Shared Trip — TripMind' }
+
+  const duration =
+    Math.round(
+      (new Date(trip.end_date).getTime() - new Date(trip.start_date).getTime()) /
+        (1000 * 60 * 60 * 24)
+    ) + 1
+  const description = `${duration}-day trip to ${trip.destination} · ${trip.start_date} → ${trip.end_date}. Planned with TripMind AI.`
+  const ogTitle = `${trip.title} · ${trip.destination}`
+
   return {
-    title: `${trip.title} · ${trip.destination} — TripMind`,
-    description: `View this trip to ${trip.destination}, shared via TripMind.`,
+    title: `${ogTitle} — TripMind`,
+    description,
+    openGraph: {
+      title: ogTitle,
+      description,
+      type: 'website',
+      siteName: 'TripMind',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: ogTitle,
+      description,
+    },
   }
 }
 
