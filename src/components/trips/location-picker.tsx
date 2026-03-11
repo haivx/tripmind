@@ -1,10 +1,17 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { createPortal } from 'react-dom'
 import { Loader2, MapPin, X } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Popover, PopoverAnchor, PopoverContent } from '@/components/ui/popover'
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command'
 import { searchLocations, type NominatimResult } from '@/lib/geocode'
 
 export interface LocationSelection {
@@ -25,36 +32,8 @@ export function LocationPicker({ initialValue, onSelect, error }: LocationPicker
   const [loading, setLoading] = useState(false)
   const [selected, setSelected] = useState(!!initialValue)
   const [open, setOpen] = useState(false)
-  const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({})
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const containerRef = useRef<HTMLDivElement>(null)
-  const inputWrapRef = useRef<HTMLDivElement>(null)
-  const portalRef = useRef<HTMLUListElement>(null)
-
-  // Close on outside click — checks both the container and the portal dropdown
-  useEffect(() => {
-    function handleClick(e: MouseEvent) {
-      const inContainer = containerRef.current?.contains(e.target as Node)
-      const inPortal = portalRef.current?.contains(e.target as Node)
-      if (!inContainer && !inPortal) setOpen(false)
-    }
-    document.addEventListener('mousedown', handleClick)
-    return () => document.removeEventListener('mousedown', handleClick)
-  }, [])
-
-  // Position the portal dropdown under the input whenever it opens
-  useEffect(() => {
-    if (open && inputWrapRef.current) {
-      const rect = inputWrapRef.current.getBoundingClientRect()
-      setDropdownStyle({
-        position: 'fixed',
-        top: rect.bottom + 4,
-        left: rect.left,
-        width: rect.width,
-        zIndex: 9999,
-      })
-    }
-  }, [open])
+  const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (selected) return
@@ -88,6 +67,7 @@ export function LocationPicker({ initialValue, onSelect, error }: LocationPicker
       latitude: parseFloat(result.lat),
       longitude: parseFloat(result.lon),
     })
+    inputRef.current?.focus()
   }
 
   function handleClear() {
@@ -96,6 +76,7 @@ export function LocationPicker({ initialValue, onSelect, error }: LocationPicker
     setResults([])
     setOpen(false)
     onSelect(null)
+    inputRef.current?.focus()
   }
 
   function handleQueryChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -108,35 +89,70 @@ export function LocationPicker({ initialValue, onSelect, error }: LocationPicker
   }
 
   return (
-    <div ref={containerRef} className="space-y-2">
+    <div className="space-y-2">
       <Label htmlFor="location-search">Address / Location</Label>
-      <div ref={inputWrapRef} className="relative">
-        <Input
-          id="location-search"
-          value={query}
-          onChange={handleQueryChange}
-          placeholder="Search for a place…"
-          autoComplete="off"
-          className={error ? 'border-destructive pr-8' : 'pr-8'}
-          aria-expanded={open}
-          aria-haspopup="listbox"
-          aria-autocomplete="list"
-          role="combobox"
-        />
-        <div className="absolute right-2 top-1/2 -translate-y-1/2">
-          {loading && <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />}
-          {!loading && selected && (
-            <button
-              type="button"
-              onClick={handleClear}
-              className="text-muted-foreground hover:text-foreground"
-              aria-label="Clear location"
-            >
-              <X className="h-3.5 w-3.5" />
-            </button>
-          )}
-        </div>
-      </div>
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverAnchor asChild>
+          <div className="relative">
+            <Input
+              ref={inputRef}
+              id="location-search"
+              value={query}
+              onChange={handleQueryChange}
+              onFocus={() => {
+                if (results.length > 0 && !selected) setOpen(true)
+              }}
+              placeholder="Search for a place…"
+              autoComplete="off"
+              className={error ? 'border-destructive pr-8' : 'pr-8'}
+              aria-expanded={open}
+              aria-haspopup="listbox"
+              aria-autocomplete="list"
+              role="combobox"
+            />
+            <div className="absolute right-2 top-1/2 -translate-y-1/2">
+              {loading && <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />}
+              {!loading && selected && (
+                <button
+                  type="button"
+                  onClick={handleClear}
+                  className="text-muted-foreground hover:text-foreground"
+                  aria-label="Clear location"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              )}
+            </div>
+          </div>
+        </PopoverAnchor>
+        <PopoverContent
+          align="start"
+          onOpenAutoFocus={(e) => e.preventDefault()}
+          className="p-0 w-[var(--radix-popper-anchor-width)]"
+        >
+          <Command shouldFilter={false}>
+            <CommandList>
+              {results.length === 0 ? (
+                <CommandEmpty>No results found.</CommandEmpty>
+              ) : (
+                <CommandGroup>
+                  {results.map((r) => (
+                    <CommandItem
+                      key={r.place_id}
+                      value={r.display_name}
+                      onSelect={() => handleSelect(r)}
+                      className="flex items-start gap-2 min-h-[44px] py-2.5 cursor-pointer"
+                    >
+                      <MapPin className="h-3.5 w-3.5 shrink-0 mt-0.5 text-muted-foreground" />
+                      <span className="line-clamp-2 text-sm">{r.display_name}</span>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              )}
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
 
       {selected && (
         <p className="flex items-center gap-1 text-xs text-green-700">
@@ -152,32 +168,6 @@ export function LocationPicker({ initialValue, onSelect, error }: LocationPicker
       )}
 
       {error && <p className="text-xs text-destructive">{error}</p>}
-
-      {open && results.length > 0 && typeof window !== 'undefined' &&
-        createPortal(
-          <ul
-            ref={portalRef}
-            role="listbox"
-            style={dropdownStyle}
-            className="rounded-md border border-border bg-popover shadow-md max-h-60 overflow-y-auto"
-          >
-            {results.map((r) => (
-              <li
-                key={r.place_id}
-                role="option"
-                aria-selected={false}
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={() => handleSelect(r)}
-                className="flex items-start gap-2 px-3 py-2.5 cursor-pointer hover:bg-accent min-h-[44px] text-sm"
-              >
-                <MapPin className="h-3.5 w-3.5 shrink-0 mt-0.5 text-muted-foreground" />
-                <span className="line-clamp-2">{r.display_name}</span>
-              </li>
-            ))}
-          </ul>,
-          document.body
-        )
-      }
     </div>
   )
 }
