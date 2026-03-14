@@ -81,13 +81,13 @@ export function SortablePlaceItem({ place }: SortablePlaceItemProps) {
         <div className="flex gap-3 mt-0.5 flex-wrap">
           {place.visit_time && (
             <span className="flex items-center gap-1 text-xs text-[#717171] dark:text-muted-foreground">
-              <Clock className="h-3 w-3 text-[#FF385C]" />
+              <Clock className="h-3 w-3 text-[#3B82F6]" />
               {place.visit_time}
             </span>
           )}
           {place.address && (
             <span className="flex items-center gap-1 text-xs text-[#717171] dark:text-muted-foreground truncate max-w-[200px]">
-              <MapPin className="h-3 w-3 shrink-0 text-[#FF385C]" />
+              <MapPin className="h-3 w-3 shrink-0 text-[#3B82F6]" />
               {place.address}
             </span>
           )}

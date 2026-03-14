@@ -105,7 +105,7 @@ export default async function SharePage({ params }: PageProps) {
     <div className="min-h-screen bg-[#F7F7F7]">
       {/* Header */}
       <header className="bg-white border-b px-4 py-3 flex items-center gap-2">
-        <Plane className="h-5 w-5 text-[#FF385C]" />
+        <Plane className="h-5 w-5 text-[#3B82F6]" />
         <span className="font-semibold text-[#1A1A2E]">TripMind</span>
         <span className="ml-2 text-xs bg-[#F7F7F7] border rounded-full px-2 py-0.5 text-[#717171]">
           Shared trip
@@ -124,17 +124,17 @@ export default async function SharePage({ params }: PageProps) {
         {/* Stats */}
         <div className="grid grid-cols-3 gap-3">
           <div className="bg-white rounded-2xl p-4 shadow-sm text-center">
-            <CalendarDays className="h-4 w-4 mx-auto mb-1 text-[#FF385C]" />
+            <CalendarDays className="h-4 w-4 mx-auto mb-1 text-[#3B82F6]" />
             <p className="text-2xl font-bold text-[#1A1A2E]">{duration}</p>
             <p className="text-xs text-[#717171]">days</p>
           </div>
           <div className="bg-white rounded-2xl p-4 shadow-sm text-center">
-            <MapPin className="h-4 w-4 mx-auto mb-1 text-[#FF385C]" />
+            <MapPin className="h-4 w-4 mx-auto mb-1 text-[#3B82F6]" />
             <p className="text-2xl font-bold text-[#1A1A2E]">{allPlaces.length}</p>
             <p className="text-xs text-[#717171]">places</p>
           </div>
           <div className="bg-white rounded-2xl p-4 shadow-sm text-center">
-            <Clock className="h-4 w-4 mx-auto mb-1 text-[#FF385C]" />
+            <Clock className="h-4 w-4 mx-auto mb-1 text-[#3B82F6]" />
             <p className="text-sm font-bold text-[#1A1A2E] leading-tight">{t.start_date}</p>
             <p className="text-xs text-[#717171]">start date</p>
           </div>
@@ -153,11 +153,11 @@ export default async function SharePage({ params }: PageProps) {
           <div>
             <h2 className="text-base font-bold text-[#1A1A2E] mb-3">Itinerary</h2>
             <div className="relative">
-              <div className="absolute left-5 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[#FF385C] via-[#FF385C] to-gray-200 rounded-full" />
+              <div className="absolute left-5 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[#3B82F6] via-[#3B82F6] to-gray-200 rounded-full" />
               <div className="space-y-5">
                 {[...grouped.entries()].map(([date, dayPlaces], idx) => (
                   <div key={date} className="relative pl-14">
-                    <div className="absolute left-0 top-0 w-10 h-10 bg-[#FF385C] rounded-xl flex items-center justify-center shadow-sm">
+                    <div className="absolute left-0 top-0 w-10 h-10 bg-[#3B82F6] rounded-xl flex items-center justify-center shadow-sm">
                       {date === 'undated' ? (
                         <MapPin className="h-4 w-4 text-white" />
                       ) : (
@@ -216,7 +216,7 @@ export default async function SharePage({ params }: PageProps) {
         {/* Footer */}
         <p className="text-center text-xs text-[#717171] pt-4 pb-8">
           Shared via{' '}
-          <span className="font-semibold text-[#FF385C]">TripMind</span> · AI Travel Planner
+          <span className="font-semibold text-[#3B82F6]">TripMind</span> · AI Travel Planner
         </p>
       </main>
     </div>

@@ -90,7 +90,7 @@ export default async function BudgetPage({ params }: PageProps) {
     <div className="space-y-6">
       {/* Grand total in JPY (shown when there are non-JPY currencies) */}
       {hasMultipleCurrencies && (
-        <div className="bg-[#FF385C] rounded-2xl p-5 text-white">
+        <div className="bg-[#3B82F6] rounded-2xl p-5 text-white">
           <p className="text-xs opacity-80 mb-0.5">Estimated Total (JPY)</p>
           <p className="text-3xl font-bold">{formatAmount(Math.round(totalJPY), 'JPY')}</p>
           <p className="text-xs opacity-70 mt-1.5">Converted at fixed rates &middot; for reference only</p>
@@ -128,7 +128,7 @@ export default async function BudgetPage({ params }: PageProps) {
                       cy="40"
                       r="30"
                       fill="none"
-                      stroke="#FF385C"
+                      stroke="#3B82F6"
                       strokeWidth="12"
                       strokeDasharray={`${2 * Math.PI * 30 * (topCategory[1] / total)} ${2 * Math.PI * 30}`}
                       strokeLinecap="round"
@@ -142,7 +142,7 @@ export default async function BudgetPage({ params }: PageProps) {
               {/* Legend */}
               <div className="flex gap-3 mt-4 pt-4 border-t border-gray-100">
                 <div className="flex items-center gap-1.5">
-                  <div className="w-3 h-3 rounded-full bg-[#FF385C]" />
+                  <div className="w-3 h-3 rounded-full bg-[#3B82F6]" />
                   <span className="text-xs text-[#717171]">{CATEGORY_LABEL[topCategory[0]] ?? topCategory[0]}</span>
                   <span className="text-xs font-semibold text-[#1A1A2E]">
                     {Math.round((topCategory[1] / total) * 100)}%
@@ -183,7 +183,7 @@ export default async function BudgetPage({ params }: PageProps) {
                         className="h-full rounded-full transition-all"
                         style={{
                           width: `${pct}%`,
-                          backgroundColor: isHighest ? '#FF385C' : '#FF385C',
+                          backgroundColor: isHighest ? '#3B82F6' : '#3B82F6',
                           opacity: isHighest ? 1 : 0.6,
                         }}
                       />

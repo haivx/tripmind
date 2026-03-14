@@ -113,7 +113,7 @@ export function ItineraryTimeline({ initialPlaces, tripId }: ItineraryTimelinePr
 
       <div className="relative">
         {/* Vertical line */}
-        <div className="absolute left-5 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[#FF385C] via-[#FF385C] to-gray-200 dark:to-gray-700 rounded-full" />
+        <div className="absolute left-5 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[#3B82F6] via-[#3B82F6] to-gray-200 dark:to-gray-700 rounded-full" />
 
         <div className="space-y-8">
           {dayEntries.map(([date, dayPlaces], dayIndex) => {
@@ -123,7 +123,7 @@ export function ItineraryTimeline({ initialPlaces, tripId }: ItineraryTimelinePr
             return (
               <div key={date} className="relative pl-14">
                 {/* Day badge */}
-                <div className="absolute left-0 top-0 w-10 h-10 bg-[#FF385C] rounded-xl flex items-center justify-center shadow-sm">
+                <div className="absolute left-0 top-0 w-10 h-10 bg-[#3B82F6] rounded-xl flex items-center justify-center shadow-sm">
                   {date === 'undated' ? (
                     <Calendar className="h-4 w-4 text-white" />
                   ) : (

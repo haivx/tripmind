@@ -71,7 +71,7 @@ export default async function TripOverviewPage({ params }: PageProps) {
           </div>
           <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
             <div
-              className="h-full bg-[#FF385C] rounded-full transition-all"
+              className="h-full bg-blue-600 rounded-full transition-all"
               style={{ width: `${bookingPct}%` }}
             />
           </div>
@@ -92,7 +92,7 @@ export default async function TripOverviewPage({ params }: PageProps) {
 
         <div className="bg-white rounded-2xl p-4 shadow-sm">
           <div className="flex items-center gap-1.5 text-[#717171] text-xs mb-1.5">
-            <MapPin className="h-3.5 w-3.5 text-[#FF385C]" />
+            <MapPin className="h-3.5 w-3.5 text-blue-600" />
             Places
           </div>
           <p className="text-2xl font-bold text-[#1A1A2E]">{allPlaces.length}</p>
@@ -101,7 +101,7 @@ export default async function TripOverviewPage({ params }: PageProps) {
 
         <div className="bg-white rounded-2xl p-4 shadow-sm">
           <div className="flex items-center gap-1.5 text-[#717171] text-xs mb-1.5">
-            <CheckSquare className="h-3.5 w-3.5 text-[#FF385C]" />
+            <CheckSquare className="h-3.5 w-3.5 text-blue-600" />
             Booked
           </div>
           <p className="text-2xl font-bold text-[#1A1A2E]">{bookedCount}</p>
