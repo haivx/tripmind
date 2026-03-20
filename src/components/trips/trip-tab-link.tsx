@@ -22,11 +22,12 @@ export function TripTabLink({ href, label }: TripTabLinkProps) {
     <Link
       href={href}
       className={cn(
-        'px-3 py-2 text-sm font-medium whitespace-nowrap border-b-2 -mb-px transition-colors',
+        'px-3 py-2 text-sm font-medium whitespace-nowrap border-b-2 -mb-px transition-colors duration-200',
         isActive
-          ? 'border-primary text-foreground'
-          : 'border-transparent text-muted-foreground hover:text-foreground'
+          ? 'border-[#E11D48] text-white'
+          : 'border-transparent hover:text-white/70'
       )}
+      style={{ color: isActive ? 'white' : 'rgba(255,255,255,0.4)' }}
     >
       {label}
     </Link>

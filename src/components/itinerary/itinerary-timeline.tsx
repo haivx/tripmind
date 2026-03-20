@@ -78,7 +78,6 @@ export function ItineraryTimeline({ initialPlaces, tripId }: ItineraryTimelinePr
           sort_order: i,
         }))
 
-        // Persist in background
         const items = reordered.map(p => ({ id: p.id, sort_order: p.sort_order }))
         fetch(`/api/trips/${tripId}/places/reorder`, {
           method: 'PATCH',
@@ -94,9 +93,11 @@ export function ItineraryTimeline({ initialPlaces, tripId }: ItineraryTimelinePr
 
   if (places.length === 0) {
     return (
-      <div className="text-center py-16 text-[#717171] dark:text-muted-foreground text-sm">
-        <MapPin className="h-8 w-8 mx-auto mb-2 opacity-30" />
-        <p>No places yet. Add places and set visit dates to build your itinerary.</p>
+      <div className="flex flex-col items-center justify-center py-16 text-center gap-3">
+        <MapPin className="h-8 w-8" style={{ color: 'rgba(255,255,255,0.2)' }} />
+        <p className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>
+          No places yet. Add places and set visit dates to build your itinerary.
+        </p>
       </div>
     )
   }
@@ -113,7 +114,10 @@ export function ItineraryTimeline({ initialPlaces, tripId }: ItineraryTimelinePr
 
       <div className="relative">
         {/* Vertical line */}
-        <div className="absolute left-5 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[#3B82F6] via-[#3B82F6] to-gray-200 dark:to-gray-700 rounded-full" />
+        <div
+          className="absolute left-5 top-0 bottom-0 w-0.5 rounded-full"
+          style={{ background: 'linear-gradient(to bottom, #E11D48, rgba(255,255,255,0.08))' }}
+        />
 
         <div className="space-y-8">
           {dayEntries.map(([date, dayPlaces], dayIndex) => {
@@ -123,7 +127,13 @@ export function ItineraryTimeline({ initialPlaces, tripId }: ItineraryTimelinePr
             return (
               <div key={date} className="relative pl-14">
                 {/* Day badge */}
-                <div className="absolute left-0 top-0 w-10 h-10 bg-[#3B82F6] rounded-xl flex items-center justify-center shadow-sm">
+                <div
+                  className="absolute left-0 top-0 w-10 h-10 rounded-xl flex items-center justify-center"
+                  style={{
+                    background: '#E11D48',
+                    boxShadow: '0 0 16px rgba(225,29,72,0.4)',
+                  }}
+                >
                   {date === 'undated' ? (
                     <Calendar className="h-4 w-4 text-white" />
                   ) : (
@@ -132,10 +142,16 @@ export function ItineraryTimeline({ initialPlaces, tripId }: ItineraryTimelinePr
                 </div>
 
                 {/* Day card */}
-                <div className="bg-white dark:bg-card rounded-2xl p-4 shadow-sm dark:border dark:border-border">
-                  <div className="mb-3 pb-3 border-b border-gray-100 dark:border-border">
-                    <h2 className="text-[#1A1A2E] dark:text-foreground font-bold">{formatDate(date)}</h2>
-                    <p className="text-xs text-[#717171] dark:text-muted-foreground mt-0.5">
+                <div
+                  className="rounded-2xl p-4"
+                  style={{
+                    background: '#13162a',
+                    border: '1px solid rgba(255,255,255,0.07)',
+                  }}
+                >
+                  <div className="mb-3 pb-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+                    <h2 className="text-white font-bold">{formatDate(date)}</h2>
+                    <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.4)' }}>
                       {sorted.length} place{sorted.length !== 1 ? 's' : ''} · drag to reorder
                     </p>
                   </div>

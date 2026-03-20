@@ -2,9 +2,6 @@
 
 import { useState, useRef, useEffect, memo } from 'react'
 import { Send, Bot, User, Loader2 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
-import { cn } from '@/lib/utils'
 import type { ChatMessage } from '@/types'
 
 const SUGGESTED_QUESTIONS = [
@@ -24,24 +21,25 @@ interface DisplayMessage {
   content: string
 }
 
-// Memoized — skips re-render entirely while streaming is happening
 const MessageBubble = memo(({ message }: { message: DisplayMessage }) => (
-  <div className={cn('flex gap-2.5', message.role === 'user' ? 'flex-row-reverse' : 'flex-row')}>
+  <div className={`flex gap-2.5 ${message.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
     <div
-      className={cn(
-        'flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs',
-        message.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
-      )}
+      className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs"
+      style={
+        message.role === 'user'
+          ? { background: '#E11D48', color: 'white' }
+          : { background: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.6)' }
+      }
     >
       {message.role === 'user' ? <User className="h-3.5 w-3.5" /> : <Bot className="h-3.5 w-3.5" />}
     </div>
     <div
-      className={cn(
-        'max-w-[80%] rounded-2xl px-3.5 py-2.5 text-sm',
+      className="max-w-[80%] rounded-2xl px-3.5 py-2.5 text-sm"
+      style={
         message.role === 'user'
-          ? 'bg-primary text-primary-foreground rounded-tr-sm'
-          : 'bg-muted text-foreground rounded-tl-sm'
-      )}
+          ? { background: '#E11D48', color: 'white', borderTopRightRadius: '4px' }
+          : { background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.85)', borderTopLeftRadius: '4px' }
+      }
     >
       <p className="whitespace-pre-wrap leading-relaxed">{message.content}</p>
     </div>
@@ -50,16 +48,21 @@ const MessageBubble = memo(({ message }: { message: DisplayMessage }) => (
 
 MessageBubble.displayName = 'MessageBubble'
 
-// Isolated — ONLY this component re-renders on every token during streaming
 function StreamingBubble({ content, isStreaming }: { content: string; isStreaming: boolean }) {
   return (
     <div className="flex gap-2.5 flex-row">
-      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs bg-muted text-muted-foreground">
+      <div
+        className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs"
+        style={{ background: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.6)' }}
+      >
         <Bot className="h-3.5 w-3.5" />
       </div>
-      <div className="max-w-[80%] rounded-2xl px-3.5 py-2.5 text-sm bg-muted text-foreground rounded-tl-sm">
+      <div
+        className="max-w-[80%] rounded-2xl px-3.5 py-2.5 text-sm"
+        style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.85)', borderTopLeftRadius: '4px' }}
+      >
         {content === '' && isStreaming ? (
-          <Loader2 className="h-4 w-4 animate-spin" />
+          <Loader2 className="h-4 w-4 animate-spin" style={{ color: 'rgba(255,255,255,0.4)' }} />
         ) : (
           <p className="whitespace-pre-wrap leading-relaxed">{content}</p>
         )}
@@ -79,7 +82,6 @@ export function ChatInterface({ tripId, initialMessages }: Props) {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const streamingContentRef = useRef('')
 
-  // Only scroll when a new complete message is committed — not on every token
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
@@ -92,7 +94,7 @@ export function ChatInterface({ tripId, initialMessages }: Props) {
     const updated: DisplayMessage[] = [...messages, { role: 'user', content }]
     setMessages(updated)
     setIsStreaming(true)
-    setStreamingContent('')         // show streaming bubble immediately
+    setStreamingContent('')
     streamingContentRef.current = ''
 
     try {
@@ -129,9 +131,8 @@ export function ChatInterface({ tripId, initialMessages }: Props) {
         }
       }
 
-      // Commit final content to history
       const finalContent = streamingContentRef.current
-      setStreamingContent(null)     // hide streaming bubble
+      setStreamingContent(null)
       setMessages([...updated, { role: 'assistant', content: finalContent }])
 
     } catch {
@@ -157,17 +158,31 @@ export function ChatInterface({ tripId, initialMessages }: Props) {
       <div className="flex-1 overflow-y-auto space-y-4 pb-2">
         {isEmpty && (
           <div className="flex flex-col items-center justify-center h-full gap-4 text-center py-8">
-            <Bot className="h-10 w-10 text-muted-foreground/40" />
+            <div
+              className="w-12 h-12 rounded-2xl flex items-center justify-center"
+              style={{ background: 'rgba(225,29,72,0.12)', border: '1px solid rgba(225,29,72,0.2)' }}
+            >
+              <Bot className="h-6 w-6" style={{ color: '#E11D48' }} />
+            </div>
             <div>
-              <p className="font-medium text-sm">Ask me anything about your trip</p>
-              <p className="text-xs text-muted-foreground mt-1">I know your saved places and dates</p>
+              <p className="font-medium text-sm text-white">Ask me anything about your trip</p>
+              <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                I know your saved places and dates
+              </p>
             </div>
             <div className="flex flex-wrap gap-2 justify-center max-w-sm">
               {SUGGESTED_QUESTIONS.map((q) => (
                 <button
                   key={q}
                   onClick={() => send(q)}
-                  className="text-xs px-3 py-1.5 rounded-full border border-border bg-muted/50 hover:bg-muted transition-colors text-left"
+                  className="text-xs px-3 py-1.5 rounded-full cursor-pointer transition-colors duration-200 text-left"
+                  style={{
+                    background: 'rgba(255,255,255,0.06)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    color: 'rgba(255,255,255,0.65)',
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)' }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.06)' }}
                 >
                   {q}
                 </button>
@@ -176,12 +191,10 @@ export function ChatInterface({ tripId, initialMessages }: Props) {
           </div>
         )}
 
-        {/* History — memoized, not affected by streaming */}
         {messages.map((msg, i) => (
           <MessageBubble key={i} message={msg} />
         ))}
 
-        {/* Streaming bubble — isolated, only re-renders during active stream */}
         {streamingContent !== null && (
           <StreamingBubble content={streamingContent} isStreaming={isStreaming} />
         )}
@@ -195,7 +208,14 @@ export function ChatInterface({ tripId, initialMessages }: Props) {
             <button
               key={q}
               onClick={() => send(q)}
-              className="text-xs px-3 py-1.5 rounded-full border border-border bg-muted/50 hover:bg-muted transition-colors whitespace-nowrap shrink-0"
+              className="text-xs px-3 py-1.5 rounded-full cursor-pointer transition-colors duration-200 whitespace-nowrap shrink-0"
+              style={{
+                background: 'rgba(255,255,255,0.06)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                color: 'rgba(255,255,255,0.55)',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)' }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.06)' }}
             >
               {q}
             </button>
@@ -203,25 +223,32 @@ export function ChatInterface({ tripId, initialMessages }: Props) {
         </div>
       )}
 
-      <div className="flex gap-2 pt-2 border-t">
-        <Textarea
+      <div className="flex gap-2 pt-3" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+        <textarea
           ref={textareaRef}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Ask about your trip..."
-          className="min-h-[44px] max-h-32 resize-none text-sm"
+          className="flex-1 min-h-[44px] max-h-32 resize-none text-sm rounded-xl px-3 py-2.5 outline-none transition-colors duration-200"
+          style={{
+            background: 'rgba(255,255,255,0.05)',
+            border: '1px solid rgba(255,255,255,0.1)',
+            color: 'white',
+          }}
           rows={1}
           disabled={isStreaming}
+          onFocus={(e) => { e.currentTarget.style.borderColor = 'rgba(225,29,72,0.5)' }}
+          onBlur={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)' }}
         />
-        <Button
-          size="icon"
+        <button
           onClick={() => send(input)}
           disabled={!input.trim() || isStreaming}
-          className="shrink-0 self-end"
+          className="shrink-0 self-end w-10 h-10 rounded-xl flex items-center justify-center cursor-pointer transition-all duration-200 disabled:opacity-40 hover:-translate-y-px"
+          style={{ background: '#E11D48', boxShadow: '0 0 16px rgba(225,29,72,0.35)', color: 'white' }}
         >
           {isStreaming ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-        </Button>
+        </button>
       </div>
     </div>
   )

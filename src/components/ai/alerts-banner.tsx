@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import { AlertTriangle, X, RefreshCw, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
-import { Button } from '@/components/ui/button'
 import type { Alert } from '@/types'
 
 interface Props {
@@ -28,9 +27,6 @@ export function AlertsBanner({ tripId, initialAlerts }: Props) {
         toast.error(json.error ?? 'Failed to check alerts')
         return
       }
-      // Refetch from DB by simulating the new list — we need actual IDs for dismiss
-      // Instead, re-fetch alerts from Supabase via a GET endpoint is cleaner,
-      // but for simplicity use the returned data and mark them as non-dismissed with fake IDs
       const newAlerts = json.data as Array<{ type: string; message: string }>
       setAlerts(
         newAlerts.map((a, i) => ({
@@ -54,7 +50,6 @@ export function AlertsBanner({ tripId, initialAlerts }: Props) {
   async function handleDismiss(alertId: string) {
     setAlerts((prev) => prev.filter((a) => a.id !== alertId))
 
-    // Only dismiss real DB alerts (not tmp ones from generate response)
     if (!alertId.startsWith('tmp-')) {
       fetch(`/api/alerts/${alertId}`, {
         method: 'PATCH',
@@ -64,60 +59,53 @@ export function AlertsBanner({ tripId, initialAlerts }: Props) {
     }
   }
 
-  if (alerts.length === 0) {
-    return (
-      <div className="flex justify-end">
-        <Button
-          size="sm"
-          variant="ghost"
-          onClick={handleGenerate}
-          disabled={isGenerating}
-          className="text-muted-foreground text-xs"
-        >
-          {isGenerating ? (
-            <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" />
-          ) : (
-            <RefreshCw className="h-3.5 w-3.5 mr-1" />
-          )}
-          Check alerts
-        </Button>
-      </div>
-    )
-  }
+  const refreshBtn = (
+    <div className="flex justify-end">
+      <button
+        onClick={handleGenerate}
+        disabled={isGenerating}
+        className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg cursor-pointer transition-colors duration-200 disabled:opacity-50"
+        style={{ color: 'rgba(255,255,255,0.4)', background: 'transparent' }}
+        onMouseEnter={(e) => { e.currentTarget.style.color = 'rgba(255,255,255,0.7)' }}
+        onMouseLeave={(e) => { e.currentTarget.style.color = 'rgba(255,255,255,0.4)' }}
+      >
+        {isGenerating ? (
+          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+        ) : (
+          <RefreshCw className="h-3.5 w-3.5" />
+        )}
+        {alerts.length === 0 ? 'Check alerts' : 'Refresh alerts'}
+      </button>
+    </div>
+  )
+
+  if (alerts.length === 0) return refreshBtn
 
   return (
     <div className="space-y-2">
       {alerts.map((alert) => (
         <div
           key={alert.id}
-          className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/20 px-3 py-2.5"
+          className="flex items-start gap-3 rounded-xl px-3 py-2.5"
+          style={{
+            background: 'rgba(245,158,11,0.08)',
+            border: '1px solid rgba(245,158,11,0.2)',
+          }}
         >
-          <AlertTriangle className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />
-          <p className="flex-1 text-sm text-amber-800 dark:text-amber-200">{alert.message}</p>
+          <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" style={{ color: '#f59e0b' }} />
+          <p className="flex-1 text-sm" style={{ color: 'rgba(255,255,255,0.75)' }}>{alert.message}</p>
           <button
             onClick={() => handleDismiss(alert.id)}
-            className="text-amber-500 hover:text-amber-700 shrink-0"
+            className="shrink-0 cursor-pointer transition-colors duration-200"
+            style={{ color: 'rgba(255,255,255,0.3)' }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = 'rgba(255,255,255,0.6)' }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = 'rgba(255,255,255,0.3)' }}
           >
             <X className="h-4 w-4" />
           </button>
         </div>
       ))}
-      <div className="flex justify-end">
-        <Button
-          size="sm"
-          variant="ghost"
-          onClick={handleGenerate}
-          disabled={isGenerating}
-          className="text-muted-foreground text-xs"
-        >
-          {isGenerating ? (
-            <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" />
-          ) : (
-            <RefreshCw className="h-3.5 w-3.5 mr-1" />
-          )}
-          Refresh alerts
-        </Button>
-      </div>
+      {refreshBtn}
     </div>
   )
 }

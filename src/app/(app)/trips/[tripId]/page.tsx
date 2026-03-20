@@ -10,7 +10,7 @@ interface PageProps {
   params: Promise<{ tripId: string }>
 }
 
-const CATEGORY_EMOJI: Record<string, string> = {
+const CATEGORY_ICON: Record<string, string> = {
   accommodation: '🏨',
   restaurant: '🍜',
   attraction: '🗼',
@@ -29,6 +29,12 @@ const CATEGORY_LABEL: Record<string, string> = {
 function tripDuration(start: string, end: string): number {
   const ms = new Date(end).getTime() - new Date(start).getTime()
   return Math.round(ms / (1000 * 60 * 60 * 24)) + 1
+}
+
+const CARD_STYLE = {
+  background: '#13162a',
+  border: '1px solid rgba(255,255,255,0.07)',
+  borderRadius: '16px',
 }
 
 export default async function TripOverviewPage({ params }: PageProps) {
@@ -64,80 +70,91 @@ export default async function TripOverviewPage({ params }: PageProps) {
 
       {/* Booking progress bar */}
       {allPlaces.length > 0 && (
-        <div className="bg-white rounded-2xl p-4 shadow-sm">
+        <div style={CARD_STYLE} className="p-4">
           <div className="flex items-center justify-between mb-2.5">
-            <span className="text-sm font-semibold text-[#1A1A2E]">Booking Progress</span>
-            <span className="text-xs text-[#717171]">{bookedCount} of {allPlaces.length} booked</span>
+            <span className="text-sm font-semibold text-white">Booking Progress</span>
+            <span className="text-xs" style={{ color: 'rgba(255,255,255,0.45)' }}>
+              {bookedCount} of {allPlaces.length} booked
+            </span>
           </div>
-          <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
+          <div className="h-2 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.07)' }}>
             <div
-              className="h-full bg-blue-600 rounded-full transition-all"
-              style={{ width: `${bookingPct}%` }}
+              className="h-full rounded-full transition-all duration-500"
+              style={{ width: `${bookingPct}%`, background: '#E11D48' }}
             />
           </div>
-          <p className="text-xs text-[#717171] mt-1.5">{bookingPct}% complete</p>
+          <p className="text-xs mt-1.5" style={{ color: 'rgba(255,255,255,0.35)' }}>
+            {bookingPct}% complete
+          </p>
         </div>
       )}
 
       {/* Stats row */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <div className="bg-white rounded-2xl p-4 shadow-sm">
-          <div className="flex items-center gap-1.5 text-[#717171] text-xs mb-1.5">
+        <div style={CARD_STYLE} className="p-4">
+          <div className="flex items-center gap-1.5 text-xs mb-1.5" style={{ color: 'rgba(255,255,255,0.4)' }}>
             <CalendarDays className="h-3.5 w-3.5" />
             Duration
           </div>
-          <p className="text-2xl font-bold text-[#1A1A2E]">{duration}</p>
-          <p className="text-xs text-[#717171]">days</p>
+          <p className="text-2xl font-bold text-white">{duration}</p>
+          <p className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>days</p>
         </div>
 
-        <div className="bg-white rounded-2xl p-4 shadow-sm">
-          <div className="flex items-center gap-1.5 text-[#717171] text-xs mb-1.5">
-            <MapPin className="h-3.5 w-3.5 text-blue-600" />
+        <div style={CARD_STYLE} className="p-4">
+          <div className="flex items-center gap-1.5 text-xs mb-1.5" style={{ color: 'rgba(255,255,255,0.4)' }}>
+            <MapPin className="h-3.5 w-3.5" style={{ color: '#E11D48' }} />
             Places
           </div>
-          <p className="text-2xl font-bold text-[#1A1A2E]">{allPlaces.length}</p>
-          <p className="text-xs text-[#717171]">saved</p>
+          <p className="text-2xl font-bold text-white">{allPlaces.length}</p>
+          <p className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>saved</p>
         </div>
 
-        <div className="bg-white rounded-2xl p-4 shadow-sm">
-          <div className="flex items-center gap-1.5 text-[#717171] text-xs mb-1.5">
-            <CheckSquare className="h-3.5 w-3.5 text-blue-600" />
+        <div style={CARD_STYLE} className="p-4">
+          <div className="flex items-center gap-1.5 text-xs mb-1.5" style={{ color: 'rgba(255,255,255,0.4)' }}>
+            <CheckSquare className="h-3.5 w-3.5" style={{ color: '#4ade80' }} />
             Booked
           </div>
-          <p className="text-2xl font-bold text-[#1A1A2E]">{bookedCount}</p>
-          <p className="text-xs text-[#717171]">of {allPlaces.length}</p>
+          <p className="text-2xl font-bold text-white">{bookedCount}</p>
+          <p className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>of {allPlaces.length}</p>
         </div>
 
-        <div className="bg-white rounded-2xl p-4 shadow-sm">
-          <div className="flex items-center gap-1.5 text-[#717171] text-xs mb-1.5">
+        <div style={CARD_STYLE} className="p-4">
+          <div className="flex items-center gap-1.5 text-xs mb-1.5" style={{ color: 'rgba(255,255,255,0.4)' }}>
             <Clock className="h-3.5 w-3.5" />
             Starts
           </div>
-          <p className="text-base font-bold text-[#1A1A2E] leading-tight">{t.start_date}</p>
+          <p className="text-base font-bold text-white leading-tight">{t.start_date}</p>
         </div>
       </div>
 
       {/* Description */}
       {t.description && (
-        <div className="bg-white rounded-2xl p-4 shadow-sm">
-          <h3 className="text-sm font-semibold text-[#1A1A2E] mb-2">Notes</h3>
-          <p className="text-sm text-[#717171] whitespace-pre-wrap">{t.description}</p>
+        <div style={CARD_STYLE} className="p-4">
+          <h3 className="text-sm font-semibold text-white mb-2">Notes</h3>
+          <p className="text-sm whitespace-pre-wrap" style={{ color: 'rgba(255,255,255,0.5)' }}>
+            {t.description}
+          </p>
         </div>
       )}
 
       {/* Places by category */}
       {allPlaces.length > 0 && (
-        <div className="bg-white rounded-2xl p-4 shadow-sm">
-          <h3 className="text-sm font-semibold text-[#1A1A2E] mb-3">Saved places</h3>
+        <div style={CARD_STYLE} className="p-4">
+          <h3 className="text-sm font-semibold text-white mb-3">Saved places</h3>
           <div className="flex flex-wrap gap-2">
             {Object.entries(byCategory).map(([cat, count]) => (
               <div
                 key={cat}
-                className="flex items-center gap-1.5 bg-[#F7F7F7] px-3 py-1.5 rounded-full text-sm border border-gray-100"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm"
+                style={{
+                  background: 'rgba(255,255,255,0.06)',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  color: 'rgba(255,255,255,0.7)',
+                }}
               >
-                <span>{CATEGORY_EMOJI[cat] ?? '📍'}</span>
-                <span className="text-[#1A1A2E] capitalize">{CATEGORY_LABEL[cat] ?? cat}</span>
-                <span className="text-[#717171]">({count})</span>
+                <span>{CATEGORY_ICON[cat] ?? '📍'}</span>
+                <span>{CATEGORY_LABEL[cat] ?? cat}</span>
+                <span style={{ color: 'rgba(255,255,255,0.4)' }}>({count})</span>
               </div>
             ))}
           </div>
@@ -146,15 +163,33 @@ export default async function TripOverviewPage({ params }: PageProps) {
 
       {/* Quick actions */}
       <div className="flex flex-wrap gap-2 pt-1">
-        <Button asChild size="sm" variant="outline" className="rounded-full">
+        <Button
+          asChild
+          size="sm"
+          className="rounded-full cursor-pointer transition-colors duration-200"
+          style={{
+            background: 'rgba(255,255,255,0.06)',
+            border: '1px solid rgba(255,255,255,0.1)',
+            color: 'rgba(255,255,255,0.7)',
+          }}
+        >
           <Link href={`${base}/places`}>
-            <MapPin className="h-4 w-4 mr-1" />
+            <MapPin className="h-4 w-4 mr-1.5" />
             Manage places
           </Link>
         </Button>
-        <Button asChild size="sm" variant="outline" className="rounded-full">
+        <Button
+          asChild
+          size="sm"
+          className="rounded-full cursor-pointer transition-all duration-200 hover:-translate-y-px"
+          style={{
+            background: '#E11D48',
+            boxShadow: '0 0 16px rgba(225,29,72,0.3)',
+            color: 'white',
+          }}
+        >
           <Link href={`${base}/chat`}>
-            <MessageSquare className="h-4 w-4 mr-1" />
+            <MessageSquare className="h-4 w-4 mr-1.5" />
             Ask AI
           </Link>
         </Button>
@@ -162,10 +197,23 @@ export default async function TripOverviewPage({ params }: PageProps) {
 
       {/* Empty state */}
       {allPlaces.length === 0 && (
-        <div className="text-center py-10 text-[#717171] text-sm">
-          <MapPin className="h-8 w-8 mx-auto mb-2 opacity-30" />
-          <p>No places yet.</p>
-          <Button asChild size="sm" className="mt-3">
+        <div className="flex flex-col items-center justify-center py-12 text-center gap-3">
+          <div
+            className="w-14 h-14 rounded-2xl flex items-center justify-center"
+            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
+          >
+            <MapPin className="h-6 w-6" style={{ color: 'rgba(255,255,255,0.2)' }} />
+          </div>
+          <div>
+            <p className="text-white font-medium mb-1">No places yet</p>
+            <p className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>Start adding spots to your trip!</p>
+          </div>
+          <Button
+            asChild
+            size="sm"
+            className="cursor-pointer transition-all duration-200 hover:-translate-y-px"
+            style={{ background: '#E11D48', borderRadius: '10px', color: 'white' }}
+          >
             <Link href={`${base}/places`}>Add your first place</Link>
           </Button>
         </div>
