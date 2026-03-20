@@ -7,8 +7,9 @@
 ---
 
 **Project:** TripMind
-**Generated:** 2026-03-14 15:58:27
-**Category:** Travel/Tourism Agency
+**Updated:** 2026-03-20
+**Category:** Travel / Trip Planning SaaS
+**Theme:** Dark Funnel — Immersive, High-Conversion
 
 ---
 
@@ -19,18 +20,43 @@
 | Role | Hex | CSS Variable |
 |------|-----|--------------|
 | Primary | `#E11D48` | `--color-primary` |
+| Primary Glow | `rgba(225, 29, 72, 0.4)` | `--color-primary-glow` |
 | Secondary | `#FB7185` | `--color-secondary` |
-| CTA/Accent | `#2563EB` | `--color-cta` |
-| Background | `#FFF1F2` | `--color-background` |
-| Text | `#881337` | `--color-text` |
+| CTA/Accent | `#E11D48` | `--color-cta` |
+| Background | `#0d0f1a` | `--color-background` |
+| Surface | `#13162a` | `--color-surface` |
+| Surface Raised | `rgba(255,255,255,0.05)` | `--color-surface-raised` |
+| Border | `rgba(255,255,255,0.1)` | `--color-border` |
+| Text Primary | `#ffffff` | `--color-text` |
+| Text Secondary | `rgba(255,255,255,0.65)` | `--color-text-muted` |
+| Text Disabled | `rgba(255,255,255,0.35)` | `--color-text-disabled` |
 
-**Color Notes:** Vibrant rose + engagement blue
+**Color Notes:** Deep navy-black base. Rose-red accent as the single dominant color. No competing hues. White text only — no dark text on dark bg.
+
+---
 
 ### Typography
 
-- **Heading Font:** Inter
-- **Body Font:** Inter
-- **Mood:** Inspirational + Engaging
+- **Heading Font:** Sora (Google Fonts)
+- **Body Font:** Plus Jakarta Sans (Google Fonts)
+- **Mood:** Bold, focused, conversion-driven
+
+| Role | Size | Weight | Line Height |
+|------|------|--------|-------------|
+| Display | `56–72px` | 800 | 1.1 |
+| H1 | `40–48px` | 800 | 1.15 |
+| H2 | `28–32px` | 700 | 1.2 |
+| H3 | `20–24px` | 600 | 1.3 |
+| Body | `16px` | 400 | 1.6 |
+| Small | `14px` | 400 | 1.5 |
+| Label/Badge | `12px` | 700 | 1 |
+
+**Typography Notes:**
+- Heading accent words use `--color-primary` (#E11D48)
+- Letter-spacing for badge/label: `0.08em`, `text-transform: uppercase`
+- Never use Inter or Roboto
+
+---
 
 ### Spacing Variables
 
@@ -44,14 +70,17 @@
 | `--space-2xl` | `48px` / `3rem` | Section margins |
 | `--space-3xl` | `64px` / `4rem` | Hero padding |
 
+---
+
 ### Shadow Depths
 
 | Level | Value | Usage |
 |-------|-------|-------|
-| `--shadow-sm` | `0 1px 2px rgba(0,0,0,0.05)` | Subtle lift |
-| `--shadow-md` | `0 4px 6px rgba(0,0,0,0.1)` | Cards, buttons |
-| `--shadow-lg` | `0 10px 15px rgba(0,0,0,0.1)` | Modals, dropdowns |
-| `--shadow-xl` | `0 20px 25px rgba(0,0,0,0.15)` | Hero images, featured cards |
+| `--shadow-sm` | `0 1px 2px rgba(0,0,0,0.3)` | Subtle lift |
+| `--shadow-md` | `0 4px 6px rgba(0,0,0,0.4)` | Cards, buttons |
+| `--shadow-lg` | `0 10px 15px rgba(0,0,0,0.4)` | Modals, dropdowns |
+| `--shadow-xl` | `0 20px 40px rgba(0,0,0,0.5)` | Hero images, featured cards |
+| `--shadow-glow` | `0 0 32px rgba(225,29,72,0.45)` | CTA buttons, active states |
 
 ---
 
@@ -60,32 +89,42 @@
 ### Buttons
 
 ```css
-/* Primary Button */
+/* Primary / CTA Button */
 .btn-primary {
-  background: #2563EB;
+  background: #E11D48;
   color: white;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-weight: 600;
-  transition: all 200ms ease;
+  padding: 14px 32px;
+  border-radius: 10px;
+  font-family: 'Sora', sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  border: none;
   cursor: pointer;
+  transition: all 200ms ease;
+  box-shadow: 0 0 24px rgba(225, 29, 72, 0.4);
 }
 
 .btn-primary:hover {
-  opacity: 0.9;
-  transform: translateY(-1px);
+  opacity: 0.92;
+  transform: translateY(-2px);
+  box-shadow: 0 0 40px rgba(225, 29, 72, 0.65);
 }
 
-/* Secondary Button */
+/* Ghost / Secondary Button */
 .btn-secondary {
   background: transparent;
-  color: #E11D48;
-  border: 2px solid #E11D48;
-  padding: 12px 24px;
-  border-radius: 8px;
+  color: #FB7185;
+  border: 1.5px solid rgba(225, 29, 72, 0.5);
+  padding: 14px 32px;
+  border-radius: 10px;
   font-weight: 600;
-  transition: all 200ms ease;
   cursor: pointer;
+  transition: all 200ms ease;
+}
+
+.btn-secondary:hover {
+  background: rgba(225, 29, 72, 0.08);
+  border-color: #E11D48;
 }
 ```
 
@@ -93,17 +132,20 @@
 
 ```css
 .card {
-  background: #FFF1F2;
-  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
   padding: 24px;
-  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(12px);
   transition: all 200ms ease;
   cursor: pointer;
 }
 
 .card:hover {
-  box-shadow: var(--shadow-lg);
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(225, 29, 72, 0.35);
   transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 ```
 
@@ -111,17 +153,59 @@
 
 ```css
 .input {
-  padding: 12px 16px;
-  border: 1px solid #E2E8F0;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 8px;
+  padding: 12px 16px;
   font-size: 16px;
+  color: white;
   transition: border-color 200ms ease;
+}
+
+.input::placeholder {
+  color: rgba(255, 255, 255, 0.35);
 }
 
 .input:focus {
   border-color: #E11D48;
   outline: none;
-  box-shadow: 0 0 0 3px #E11D4820;
+  box-shadow: 0 0 0 3px rgba(225, 29, 72, 0.2);
+}
+```
+
+### Pill Badge
+
+```css
+.badge {
+  background: rgba(225, 29, 72, 0.18);
+  border: 1px solid rgba(225, 29, 72, 0.45);
+  border-radius: 999px;
+  color: #FB7185;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+```
+
+### Feature Chips
+
+```css
+.chip {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 10px 16px;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
 }
 ```
 
@@ -129,15 +213,16 @@
 
 ```css
 .modal-overlay {
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(6px);
 }
 
 .modal {
-  background: white;
-  border-radius: 16px;
+  background: #13162a;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
   padding: 32px;
-  box-shadow: var(--shadow-xl);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
   max-width: 500px;
   width: 90%;
 }
@@ -147,40 +232,74 @@
 
 ## Style Guidelines
 
-**Style:** Aurora UI
+**Style:** Dark Conversion Funnel
 
-**Keywords:** Vibrant gradients, smooth blend, Northern Lights effect, mesh gradient, luminous, atmospheric, abstract
+**Keywords:** Deep navy, rose-red accent, glassmorphism light, high contrast, atmospheric depth, single CTA focus
 
-**Best For:** Modern SaaS, creative agencies, branding, music platforms, lifestyle, premium products, hero sections
+**Best For:** SaaS onboarding, quiz funnels, trip planning flows, lead generation, feature discovery
 
-**Key Effects:** Large flowing CSS/SVG gradients, subtle 8-12s animations, depth via color layering, smooth morph
+**Key Effects:**
+- Radial gradient glow behind hero heading: `radial-gradient(ellipse at 50% 40%, rgba(225,29,72,0.15) 0%, transparent 65%)`
+- Subtle noise texture overlay on background: `opacity: 0.03–0.05`
+- Staggered fade-in on load: badge → heading → subtitle → chips → CTA, `100ms` delay increment
+- CTA button bloom on hover via `box-shadow` glow
 
-### Page Pattern
+---
 
-**Pattern Name:** Horizontal Scroll Journey
+## Page Patterns
 
-- **Conversion Strategy:** Immersive product discovery. High engagement. Keep navigation visible.
-28,Bento Grid Showcase,bento,  grid,  features,  modular,  apple-style,  showcase", 1. Hero, 2. Bento Grid (Key Features), 3. Detail Cards, 4. Tech Specs, 5. CTA, Floating Action Button or Bottom of Grid, Card backgrounds: #F5F5F7 or Glass. Icons: Vibrant brand colors. Text: Dark., Hover card scale (1.02), video inside cards, tilt effect, staggered reveal, Scannable value props. High information density without clutter. Mobile stack.
-29,Interactive 3D Configurator,3d,  configurator,  customizer,  interactive,  product", 1. Hero (Configurator), 2. Feature Highlight (synced), 3. Price/Specs, 4. Purchase, Inside Configurator UI + Sticky Bottom Bar, Neutral studio background. Product: Realistic materials. UI: Minimal overlay., Real-time rendering, material swap animation, camera rotate/zoom, light reflection, Increases ownership feeling. 360 view reduces return rates. Direct add-to-cart.
-30,AI-Driven Dynamic Landing,ai,  dynamic,  personalized,  adaptive,  generative", 1. Prompt/Input Hero, 2. Generated Result Preview, 3. How it Works, 4. Value Prop, Input Field (Hero) + 'Try it' Buttons, Adaptive to user input. Dark mode for compute feel. Neon accents., Typing text effects, shimmering generation loaders, morphing layouts, Immediate value demonstration. 'Show, don't tell'. Low friction start.
-- **CTA Placement:** Floating Sticky CTA or End of Horizontal Track
-- **Section Order:** 1. Intro (Vertical), 2. The Journey (Horizontal Track), 3. Detail Reveal, 4. Vertical Footer
+### Dark Quiz Funnel Hero
+
+**Use Case:** Onboarding, trip quiz, lead capture, feature intro
+
+**Section Order:**
+1. Pill Badge (e.g. "FREE TRIP QUIZ")
+2. Hero Heading — bold, accent color on key words
+3. Subtitle — short, benefit-focused
+4. Feature Chips Row — max 3 chips, icon + label
+5. Single CTA Button with arrow `→`
+
+**Rules:**
+- One CTA only — no competing links
+- Max 3 feature chips
+- Heading accent via `--color-primary`
+- Background always `--color-background` (#0d0f1a)
+
+---
+
+### Horizontal Scroll Journey
+
+**Use Case:** Immersive destination discovery, trip itinerary reveal
+
+**Conversion Strategy:** High engagement, keep navigation visible throughout.
+
+**Section Order:**
+1. Intro (Vertical)
+2. The Journey (Horizontal Track)
+3. Detail Reveal
+4. Vertical Footer
+
+**CTA Placement:** Floating Sticky CTA or End of Horizontal Track
 
 ---
 
 ## Anti-Patterns (Do NOT Use)
 
-- ❌ Generic photos
-- ❌ Complex booking
+- ❌ Generic stock photos
+- ❌ Complex multi-step booking flows on a single page
+- ❌ Light background — this design system is dark-only
+- ❌ More than 1 primary CTA per hero section
+- ❌ More than 3 feature chips in a row
 
 ### Additional Forbidden Patterns
 
 - ❌ **Emojis as icons** — Use SVG icons (Heroicons, Lucide, Simple Icons)
-- ❌ **Missing cursor:pointer** — All clickable elements must have cursor:pointer
+- ❌ **Missing cursor:pointer** — All clickable elements must have `cursor: pointer`
 - ❌ **Layout-shifting hovers** — Avoid scale transforms that shift layout
 - ❌ **Low contrast text** — Maintain 4.5:1 minimum contrast ratio
-- ❌ **Instant state changes** — Always use transitions (150-300ms)
+- ❌ **Instant state changes** — Always use transitions (150–300ms)
 - ❌ **Invisible focus states** — Focus states must be visible for a11y
+- ❌ **Inter / Roboto** — Use Sora + Plus Jakarta Sans only
 
 ---
 
@@ -189,12 +308,16 @@
 Before delivering any UI code, verify:
 
 - [ ] No emojis used as icons (use SVG instead)
-- [ ] All icons from consistent icon set (Heroicons/Lucide)
-- [ ] `cursor-pointer` on all clickable elements
-- [ ] Hover states with smooth transitions (150-300ms)
-- [ ] Light mode: text contrast 4.5:1 minimum
+- [ ] All icons from consistent icon set (Heroicons / Lucide)
+- [ ] `cursor: pointer` on all clickable elements
+- [ ] Hover states with smooth transitions (150–300ms)
+- [ ] Dark mode: text contrast 4.5:1 minimum (white on `#0d0f1a`)
 - [ ] Focus states visible for keyboard navigation
 - [ ] `prefers-reduced-motion` respected
 - [ ] Responsive: 375px, 768px, 1024px, 1440px
 - [ ] No content hidden behind fixed navbars
 - [ ] No horizontal scroll on mobile
+- [ ] Background is `#0d0f1a` — never white or light gray
+- [ ] Single CTA per hero — no competing buttons
+- [ ] Fonts loaded: Sora + Plus Jakarta Sans (Google Fonts)
+- [ ] Radial glow effect behind hero heading present

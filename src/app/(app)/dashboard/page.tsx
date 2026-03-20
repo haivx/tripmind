@@ -15,7 +15,7 @@ async function TripsData() {
 
   if (!user) {
     return (
-      <div className="text-center py-16 text-muted-foreground text-sm">
+      <div className="text-center py-16 text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>
         Please sign in to view your trips.
       </div>
     )
@@ -28,7 +28,7 @@ async function TripsData() {
 
   if (error) {
     return (
-      <div className="text-center py-16 text-destructive text-sm">
+      <div className="text-center py-16 text-sm" style={{ color: '#E11D48' }}>
         Failed to load trips: {error.message}
       </div>
     )
@@ -40,9 +40,16 @@ async function TripsData() {
 export default function DashboardPage() {
   return (
     <div>
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
-        <p className="text-muted-foreground text-sm mt-1">Plan and track your adventures</p>
+      <div className="mb-8">
+        <h1
+          className="text-3xl font-bold text-white mb-1"
+          style={{ fontFamily: 'var(--font-sora), sans-serif', letterSpacing: '-0.02em' }}
+        >
+          Dashboard
+        </h1>
+        <p className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>
+          Plan and track your adventures
+        </p>
       </div>
       <Suspense fallback={<TripListSkeleton />}>
         <TripsData />

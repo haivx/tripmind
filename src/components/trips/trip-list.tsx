@@ -97,18 +97,45 @@ export function TripList({ initialTrips }: TripListProps) {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-semibold">My Trips</h2>
-        <Button onClick={openCreate} size="sm">
+        <h2
+          className="text-xl font-semibold text-white"
+          style={{ fontFamily: 'var(--font-sora), sans-serif' }}
+        >
+          My Trips
+        </h2>
+        <Button
+          onClick={openCreate}
+          size="sm"
+          className="text-white text-sm cursor-pointer transition-all duration-200 hover:-translate-y-px"
+          style={{
+            background: '#E11D48',
+            boxShadow: '0 0 16px rgba(225,29,72,0.3)',
+            borderRadius: '10px',
+          }}
+        >
           <Plus className="h-4 w-4 mr-1.5" />
           New Trip
         </Button>
       </div>
 
       {trips.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 text-center text-muted-foreground gap-3">
-          <Plane className="h-10 w-10 opacity-30" />
-          <p className="text-sm">No trips yet. Plan your first adventure!</p>
-          <Button variant="outline" size="sm" onClick={openCreate}>
+        <div className="flex flex-col items-center justify-center py-20 text-center gap-4">
+          <div
+            className="w-16 h-16 rounded-2xl flex items-center justify-center"
+            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
+          >
+            <Plane className="h-7 w-7" style={{ color: 'rgba(255,255,255,0.2)' }} />
+          </div>
+          <div>
+            <p className="text-white font-medium mb-1">No trips yet</p>
+            <p className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>Plan your first adventure!</p>
+          </div>
+          <Button
+            onClick={openCreate}
+            size="sm"
+            className="text-white cursor-pointer transition-all duration-200"
+            style={{ background: '#E11D48', borderRadius: '10px' }}
+          >
             <Plus className="h-4 w-4 mr-1.5" />
             Create Trip
           </Button>
@@ -128,9 +155,14 @@ export function TripList({ initialTrips }: TripListProps) {
 
       {/* Create / Edit Dialog */}
       <Dialog open={isFormOpen} onOpenChange={(open) => !open && closeForm()}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent
+          className="sm:max-w-md"
+          style={{ background: '#13162a', border: '1px solid rgba(255,255,255,0.1)', color: 'white' }}
+        >
           <DialogHeader>
-            <DialogTitle>{editingTrip ? 'Edit Trip' : 'New Trip'}</DialogTitle>
+            <DialogTitle className="text-white" style={{ fontFamily: 'var(--font-sora), sans-serif' }}>
+              {editingTrip ? 'Edit Trip' : 'New Trip'}
+            </DialogTitle>
           </DialogHeader>
           <TripForm
             defaultValues={editingTrip ?? undefined}
@@ -161,10 +193,14 @@ export function TripListSkeleton() {
       </div>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {Array.from({ length: 3 }).map((_, i) => (
-          <div key={i} className="rounded-lg border p-4 space-y-3">
-            <Skeleton className="h-5 w-3/4" />
-            <Skeleton className="h-4 w-1/2" />
-            <Skeleton className="h-4 w-2/3" />
+          <div
+            key={i}
+            className="rounded-2xl p-5 space-y-3"
+            style={{ background: '#13162a', border: '1px solid rgba(255,255,255,0.06)' }}
+          >
+            <Skeleton className="h-5 w-3/4" style={{ background: 'rgba(255,255,255,0.07)' }} />
+            <Skeleton className="h-4 w-1/2" style={{ background: 'rgba(255,255,255,0.05)' }} />
+            <Skeleton className="h-4 w-2/3" style={{ background: 'rgba(255,255,255,0.05)' }} />
           </div>
         ))}
       </div>
