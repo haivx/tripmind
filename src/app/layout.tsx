@@ -40,13 +40,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${playfair.variable} ${inter.variable} ${sora.variable} ${plusJakarta.variable}`}>
+    <html lang="en" className={`dark ${playfair.variable} ${inter.variable} ${sora.variable} ${plusJakarta.variable}`}>
       <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(){var t=localStorage.getItem('theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark')}})()`,
-          }}
-        />
       </head>
       <body className={`${inter.className} antialiased`}>
         {children}

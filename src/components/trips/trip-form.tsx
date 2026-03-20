@@ -100,17 +100,16 @@ export function TripForm({ defaultValues, onSubmit, onCancel, isLoading }: TripF
         {errors.destination && <p className="text-destructive text-xs">{errors.destination.message}</p>}
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
-        <div className="space-y-1.5">
-          <Label htmlFor="start_date">Start Date *</Label>
-          <Input id="start_date" type="date" {...register('start_date')} />
-          {errors.start_date && <p className="text-destructive text-xs">{errors.start_date.message}</p>}
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="end_date">End Date *</Label>
-          <Input id="end_date" type="date" {...register('end_date')} />
-          {errors.end_date && <p className="text-destructive text-xs">{errors.end_date.message}</p>}
-        </div>
+      <div className="space-y-1.5">
+        <Label htmlFor="start_date">Start Date *</Label>
+        <Input id="start_date" type="date" {...register('start_date')} />
+        {errors.start_date && <p className="text-destructive text-xs">{errors.start_date.message}</p>}
+      </div>
+
+      <div className="space-y-1.5">
+        <Label htmlFor="end_date">End Date *</Label>
+        <Input id="end_date" type="date" {...register('end_date')} />
+        {errors.end_date && <p className="text-destructive text-xs">{errors.end_date.message}</p>}
       </div>
 
       <div className="space-y-1.5">
