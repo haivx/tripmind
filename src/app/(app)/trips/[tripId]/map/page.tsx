@@ -19,7 +19,11 @@ export default async function MapPage({ params }: PageProps) {
     .order('sort_order', { ascending: true })
 
   if (error) {
-    return <p className="text-sm text-destructive">Failed to load places: {error.message}</p>
+    return (
+      <p className="text-sm" style={{ color: '#f87171' }}>
+        Failed to load places: {error.message}
+      </p>
+    )
   }
 
   const allPlaces = (places ?? []) as Place[]
@@ -28,9 +32,19 @@ export default async function MapPage({ params }: PageProps) {
 
   if (allPlaces.length === 0) {
     return (
-      <div className="text-center py-16 text-[#717171] text-sm">
-        <MapPin className="h-8 w-8 mx-auto mb-2 opacity-30" />
-        <p>No places yet. Add places to see them on the map.</p>
+      <div className="flex flex-col items-center justify-center py-16 text-center gap-3">
+        <div
+          className="w-14 h-14 rounded-2xl flex items-center justify-center"
+          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
+        >
+          <MapPin className="h-6 w-6" style={{ color: 'rgba(255,255,255,0.2)' }} />
+        </div>
+        <div>
+          <p className="text-white font-medium mb-1">No places yet</p>
+          <p className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>
+            Add places to see them on the map.
+          </p>
+        </div>
       </div>
     )
   }
@@ -40,16 +54,23 @@ export default async function MapPage({ params }: PageProps) {
       <TripMapClient places={allPlaces} />
 
       {withCoords.length > 0 && withoutCoords.length > 0 && (
-        <div className="bg-white rounded-2xl p-4 shadow-sm">
-          <p className="text-xs font-semibold text-[#717171] mb-2">
-            {withoutCoords.length} place{withoutCoords.length !== 1 ? 's' : ''} without GPS
-            coordinates:
+        <div
+          className="rounded-2xl p-4"
+          style={{ background: '#13162a', border: '1px solid rgba(255,255,255,0.07)' }}
+        >
+          <p className="text-xs font-semibold mb-2" style={{ color: 'rgba(255,255,255,0.45)' }}>
+            {withoutCoords.length} place{withoutCoords.length !== 1 ? 's' : ''} without GPS coordinates:
           </p>
           <div className="flex flex-wrap gap-2">
             {withoutCoords.map((p) => (
               <span
                 key={p.id}
-                className="text-xs bg-[#F7F7F7] border border-gray-100 px-3 py-1 rounded-full text-[#1A1A2E]"
+                className="text-xs px-3 py-1 rounded-full"
+                style={{
+                  background: 'rgba(255,255,255,0.06)',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  color: 'rgba(255,255,255,0.65)',
+                }}
               >
                 {p.name}
               </span>

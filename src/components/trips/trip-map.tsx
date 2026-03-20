@@ -33,12 +33,18 @@ export function TripMap({ places }: TripMapProps) {
 
   if (mapped.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-64 text-[#717171] text-sm bg-white rounded-2xl shadow-sm gap-2">
+      <div
+        className="flex flex-col items-center justify-center h-64 rounded-2xl gap-2 text-center"
+        style={{
+          background: '#13162a',
+          border: '1px solid rgba(255,255,255,0.07)',
+        }}
+      >
         <span className="text-3xl">🗺️</span>
-        <p>No location data yet.</p>
-        <p className="text-xs text-center max-w-xs">
-          Places with GPS coordinates will appear here. Add latitude/longitude to your places to
-          see them on the map.
+        <p className="text-sm text-white font-medium">No location data yet.</p>
+        <p className="text-xs max-w-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
+          Places with GPS coordinates will appear here. Add latitude/longitude to your places to see
+          them on the map.
         </p>
       </div>
     )
@@ -69,22 +75,9 @@ export function TripMap({ places }: TripMapProps) {
           icon={createMarkerIcon(place.category)}
         >
           <Popup>
-            <div className="min-w-[140px]">
-              <p className="font-semibold text-[#1A1A2E] text-sm">{place.name}</p>
-              {place.address && (
-                <p className="text-xs text-[#717171] mt-0.5">{place.address}</p>
-              )}
-              {place.visit_date && (
-                <p className="text-xs text-[#717171] mt-0.5">📅 {place.visit_date}</p>
-              )}
-              {place.visit_time && (
-                <p className="text-xs text-[#717171]">🕐 {place.visit_time}</p>
-              )}
-              {place.booked && (
-                <span className="inline-block mt-1 text-xs px-1.5 py-0.5 bg-green-100 text-green-700 rounded-full font-medium">
-                  booked
-                </span>
-              )}
+            <div className="text-sm">
+              <p className="font-semibold">{place.name}</p>
+              {place.address && <p className="text-xs text-gray-500 mt-0.5">{place.address}</p>}
             </div>
           </Popup>
         </Marker>
