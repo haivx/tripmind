@@ -2,9 +2,9 @@
 
 Create or update Supabase database schema: $ARGUMENTS
 
-## Implementation:
+## Implementation
 
-### If creating new table:
+### If creating new table
 1. Write SQL with complete:
    - Primary key (`uuid` default)
    - Foreign keys with `on delete cascade` if appropriate
@@ -17,10 +17,7 @@ Create or update Supabase database schema: $ARGUMENTS
    alter table <table> enable row level security;
    create policy "users own <table>" on <table>
      for all using (
-       -- direct ownership
        auth.uid() = user_id
-       -- or via parent table
-       -- exists (select 1 from trips where trips.id = <table>.trip_id and trips.user_id = auth.uid())
      );
    ```
 
@@ -30,19 +27,20 @@ Create or update Supabase database schema: $ARGUMENTS
    create index on <table>(user_id);
    ```
 
-4. Update `src/lib/supabase/types.ts` with new TypeScript types
+4. Update `src/types/index.ts` with new TypeScript types
 
-### If updating existing table:
+### If updating existing table
 - Write migration SQL (ALTER TABLE)
 - Update TypeScript types
 - Check if any components need updates
 
-### Existing tables:
-- `trips` — trip information
-- `places` — locations (hotel, attraction, restaurant, transport)
-- `itinerary_days` — days in itinerary
-- `alerts` — warnings and reminders
-- `chat_messages` — AI chat history
+### Existing tables
+- `trips` — trip info (title, destination, dates, status, share_token)
+- `places` — locations (name, category, address, price, currency, booked, visit_date, lat/lng, sort_order)
+- `itinerary_days` — days in itinerary (date, title, notes) — NOT currently used in code
+- `itinerary_items` — links places to days (day_id, place_id, sort_order) — NOT currently used in code
+- `chat_messages` — AI chat history (trip_id, role, content)
+- `alerts` — warnings and reminders (type, message, dismissed)
 
-### After writing SQL:
+### After writing SQL
 Remind user to run this SQL in Supabase Dashboard > SQL Editor

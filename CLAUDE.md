@@ -1,5 +1,8 @@
 # TripMind — AI Travel Planner
 
+> **Behavior Rules:** Read `.claude/rules/behaviors.md` for how you should work.
+> **Content Safety:** Read `.claude/docs/content-safety.md` for AI feature rules.
+
 ## Project Overview
 AI-powered travel planning app. Users manage trips, places, itinerary, budget — with AI-assisted chat, itinerary suggestions, and email booking parsing.
 

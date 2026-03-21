@@ -1,10 +1,20 @@
-# Claude Code local settings (không share)
+# Claude Code local settings
 .claude/settings.local.json
 
-# Keep these in git (share với team / future self)
+# Memory files — session-specific, không commit
+memory/today.md
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Keep in git:
 # .claude/settings.json ✅
+# .claude/rules/ ✅
+# .claude/docs/ ✅
 # .claude/commands/ ✅
 # .claude/agents/ ✅
 # .claude/skills/ ✅
+# .claude/hooks/ ✅
 # .claude/MVP_CHECKLIST.md ✅
 # CLAUDE.md ✅

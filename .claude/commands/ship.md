@@ -9,8 +9,11 @@ Prepare to deploy TripMind to Vercel: $ARGUMENTS
 - [ ] `npm run lint` — no ESLint errors
 - [ ] `npm run build` — builds successfully locally
 
+### Verification
+Follow `.claude/skills/verification-before-completion/SKILL.md` for final check.
+
 ### Security
-Run the automated security check first — it catches secrets, .env leaks, and client-side exposure:
+Run the automated security check:
 ```bash
 bash .claude/hooks/security-check.sh <<< '{"tool_input":{"command":"git push origin main"}}'
 ```
@@ -36,12 +39,12 @@ If it fails, fix all reported issues before continuing.
 - [ ] Empty states have helpful content
 
 ### AI Features
-- [ ] Chat streaming works
+- [ ] Chat streaming works (with error handling)
 - [ ] AI suggest itinerary works
 - [ ] Parse email works
-- [ ] Rate limiting / error handling when Claude API fails
+- [ ] Rate limiting returns 429 correctly
 
-## Deploy Steps:
+## Deploy Steps
 ```bash
 # 1. Commit all changes
 git add -A
@@ -58,8 +61,8 @@ git push origin <branch>
 # 5. Verify on production URL
 ```
 
-## Post-deploy:
+## Post-deploy
 - [ ] Test login/signup
 - [ ] Test creating new trip
-- [ ] Test AI chat
+- [ ] Test AI chat (verify streaming + error handling)
 - [ ] Check Vercel logs if errors occur

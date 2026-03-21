@@ -2,17 +2,17 @@
 
 Build AI feature for TripMind: $ARGUMENTS
 
-## Implementation steps:
+## Implementation steps
 
 ### 1. Identify AI feature type
 - **Chat/Q&A** → use streaming, save history to `chat_messages`
 - **Generation** (itinerary, suggestions) → non-streaming OK, return JSON
 - **Extraction** (parse email, detect info) → non-streaming, return structured data
-- **Search + AI** (RAG) → need vector search first, then LLM
 
 ### 2. Write system prompt in `lib/prompts.ts`
 ```typescript
-export const PROMPT_<NAME> = `
+export function get<Feature>Prompt(context: ...): string {
+  return `
 You are [specific role] for TripMind.
 
 CONTEXT:
@@ -25,35 +25,48 @@ OUTPUT FORMAT:
 [if JSON needed, describe schema clearly]
 [if chat, describe tone and style]
 `
+}
 ```
 
 ### 3. Create API route at `src/app/api/ai/<feature-name>/route.ts`
 - Validate input with Zod
+- Check auth: `supabase.auth.getUser()`
+- Add rate limiting: `checkRateLimit(generationRateLimit, user.id)`
 - Build context from Supabase data
-- Call Claude API
-- **Chat features:** stream response
-- **Generation features:** parse JSON response, validate, return
+- Call Claude API with appropriate temperature
+- **Chat features:** stream response with try/catch/finally
+- **Generation features:** parse JSON response → validate with Zod → return
 - Handle errors gracefully
 
-### 4. Create React hook `src/hooks/use<FeatureName>.ts`
-- Encapsulate API call logic
-- Handle loading/error states
-- For streaming: handle ReadableStream
+### 4. Validate AI response (non-streaming features)
+```typescript
+const responseSchema = z.object({
+  // define expected shape from Claude's output
+})
+const validated = responseSchema.safeParse(parsed)
+if (!validated.success) {
+  return Response.json({ error: 'Invalid AI response' }, { status: 422 })
+}
+```
 
-### 5. Integrate into UI component
+### 5. Create UI component or integrate into existing page
 
-### 6. Test cases to check:
+### 6. Test cases
 - [ ] Happy path works
 - [ ] Empty/null data doesn't crash
 - [ ] API error is displayed to user
-- [ ] Streaming doesn't cut-off midway
-- [ ] Cost is reasonable (estimate tokens used)
+- [ ] Streaming doesn't cut-off midway (chat only)
+- [ ] Rate limit returns 429 correctly
+- [ ] AI response validates against Zod schema
 
-## Model & Params defaults:
+### 7. Verify
+Follow `.claude/skills/verification-before-completion/SKILL.md`
+
+## Model & Params defaults
 ```typescript
 model: "claude-sonnet-4-5"
-max_tokens: 1024  // chat
-max_tokens: 2048  // generation/extraction
-temperature: 0    // extraction (needs accuracy)
-temperature: 0.7  // generation/chat (needs creativity)
+max_tokens: 1024    // chat
+max_tokens: 2048    // generation/extraction
+temperature: 0      // extraction (needs accuracy)
+temperature: 0.7    // generation/chat (needs creativity)
 ```
