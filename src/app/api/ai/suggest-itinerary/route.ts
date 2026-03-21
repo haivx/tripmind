@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { anthropic } from '@/lib/claude'
 import { getItinerarySuggestionPrompt } from '@/lib/prompts'
+import { simpleRateLimit } from '@/lib/rate-limit-simple'
 import type { Trip, Place } from '@/types'
 
 const bodySchema = z.object({
@@ -13,6 +14,9 @@ export async function POST(req: NextRequest): Promise<Response> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const limited = simpleRateLimit(user.id, 5, 60_000)
+  if (limited) return limited
 
   let body: unknown
   try {
@@ -40,13 +44,19 @@ export async function POST(req: NextRequest): Promise<Response> {
 
   const prompt = getItinerarySuggestionPrompt(trip as Trip, allPlaces)
 
-  const message = await anthropic.messages.create({
-    model: 'claude-sonnet-4-5',
-    max_tokens: 2048,
-    messages: [{ role: 'user', content: prompt }],
-  })
+  let message: Awaited<ReturnType<typeof anthropic.messages.create>>
+  try {
+    message = await anthropic.messages.create({
+      model: 'claude-sonnet-4-5',
+      max_tokens: 2048,
+      messages: [{ role: 'user', content: prompt }],
+    })
+  } catch (err) {
+    console.error('Anthropic API error:', err)
+    return Response.json({ error: 'Failed to generate itinerary' }, { status: 500 })
+  }
 
-  const text = message.content[0].type === 'text' ? message.content[0].text : ''
+  const text = message.content[0]?.type === 'text' ? message.content[0].text : ''
 
   let itinerary: unknown
   try {
