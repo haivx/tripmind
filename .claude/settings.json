@@ -1,5 +1,6 @@
 {
   "model": "claude-sonnet-4-5",
+  "enableAllProjectMcpServers": true,
   "permissions": {
     "deny": [
       "Read(./.env.local)",

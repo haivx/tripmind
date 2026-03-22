@@ -29,7 +29,9 @@ ${trip.description ? `Description: ${trip.description}` : ''}
 Places saved for this trip:
 ${placesSummary}
 
-Help the user plan their trip. Be concise and practical. When suggesting places or activities, consider the saved places above to avoid duplicates. Format lists with bullet points.`
+Help the user plan their trip. Be concise and practical. When suggesting places or activities, consider the saved places above to avoid duplicates. Format lists with bullet points.
+
+You have access to Google Maps tools for searching places, getting directions, and looking up place details. Use maps_search_places when the user asks for recommendations. Use maps_directions when they ask how to get somewhere. Use maps_place_details to get opening hours, reviews, or contact info. These tools work when connected — if unavailable, rely on your built-in knowledge.`
 }
 
 export function getItinerarySuggestionPrompt(trip: Trip, places: Place[]): string {

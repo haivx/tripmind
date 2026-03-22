@@ -137,7 +137,29 @@ NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=       # server-side only
 ANTHROPIC_API_KEY=               # server-side only
+GOOGLE_MAPS_API_KEY=             # server-side only — geocoding + directions
 ```
+
+---
+
+## MCP Server (tripmind-maps-mcp)
+
+TripMind uses a companion MCP server (`../tripmind-maps-mcp`) that gives Claude Code access to Google Maps tools during development.
+
+**Setup:** The server is registered in `.mcp.json` at the project root. To use it:
+1. Build the MCP server: `cd ../tripmind-maps-mcp && npm run build`
+2. Set `GOOGLE_MAPS_API_KEY` in your shell (the MCP server reads it from env)
+3. Restart Claude Code — run `/mcp` to confirm `tripmind-maps` is connected
+
+**Available tools:**
+- `maps_search_places` — search for places by text or nearby
+- `maps_place_details` — get opening hours, reviews, contact info by place_id
+- `maps_geocode` — forward/reverse geocoding
+- `maps_directions` — route calculation with travel time
+- `maps_distance_matrix` — multi-origin/destination distances
+- `maps_timezone` — timezone lookup by coordinates
+
+**Note:** The MCP server is for Claude Code's dev workflow only. TripMind's runtime calls Google APIs directly (via `src/lib/geocode.ts` and the `/api/ai/suggest-itinerary` route).
 
 ---
 

@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "tripmind-maps": {
+      "command": "node",
+      "args": ["../tripmind-maps-mcp/build/index.js"],
+      "env": {
+        "GOOGLE_MAPS_API_KEY": "${env:GOOGLE_MAPS_API_KEY}"
+      }
+    }
+  }
+}
